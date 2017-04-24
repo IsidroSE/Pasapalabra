@@ -2,8 +2,8 @@
 <html>
     <head>
         <title>Gestión de <?php echo $topic; ?></title>
-        <link type="image/x-icon" href="<?php echo base_url(); ?>assets/images/logo.jpg" rel="icon" />
-        <link type="image/x-icon" href="<?php echo base_url(); ?>assets/images/logo.jpg" rel="shortcut icon" />
+        <link type="image/x-icon" href="<?php echo base_url(); ?>assets/images/logo.png" rel="icon" />
+        <link type="image/x-icon" href="<?php echo base_url(); ?>assets/images/logo.png" rel="shortcut icon" />
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <!--[if lte IE 8]><script src="assets/js/ie/html5shiv.js"></script><![endif]-->
@@ -25,18 +25,24 @@
                         <div class="12u">
 
                             <header id="header">
-                                <h1><img id="logo" src="<?php echo base_url(); ?>assets/images/logo.jpg" /></h1>
+                                <h1><img id="logo" src="<?php echo base_url(); ?>assets/images/logo.png" /></h1>
                                 <nav id="nav">
+                                    
+                                    <a class='<?php echo $topic == "preguntas" ? "current-page-item" : ""; ?>' 
+                                       href='<?php echo site_url('preguntas') ?>'>Preguntas</a>
+                                    
+                                    <?php if ($this->session->has_userdata('email') && $this->session->rol == 1) { ?>
                                     <a class='<?php echo $topic == "usuarios" ? "current-page-item" : ""; ?>' 
                                        href='<?php echo site_url('usuarios') ?>'>Usuarios</a>
                                     <a class='<?php echo $topic == "roles" ? "current-page-item" : ""; ?>' 
                                        href='<?php echo site_url('roles') ?>'>Roles</a>
-                                    <a class='<?php echo $topic == "preguntas" ? "current-page-item" : ""; ?>' 
-                                       href='<?php echo site_url('preguntas') ?>'>Preguntas</a>
                                     <a class='<?php echo $topic == "records_jugadores" ? "current-page-item" : ""; ?>' 
                                        href='<?php echo site_url('records_jugadores') ?>'>Records</a>
+                                    <?php } ?>
+                                    
                                     <a class='<?php echo $topic == "cerrar_sesion" ? "current-page-item" : ""; ?>' 
                                        href='<?php echo site_url("cerrar_sesion"); ?>'>Cerrar sesión</a>
+                                    
                                 </nav>
                             </header>
 
