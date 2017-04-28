@@ -6,11 +6,284 @@
     margin: 0px;
     padding: 0px;
     box-sizing: border-box;
-    background-color: red;
 }
 
 /*************************************************
 /* VISTA DE MÓVIL - Dispositivos < 768 píxeles */
+
+body {
+    width: 100vw;
+    font-family: Aclonica;
+    font-size: 5vw;
+}
+
+/**************************** */
+/* PANEL DE LA PUNTUACIÓN */
+section#puntuacion {
+    display: flex;
+    flex-wrap: wrap;
+    width: 100%;
+    font-size: 3vw;
+    text-align: center;
+    color: white;
+    font-weight: bold;
+    margin-bottom: 1ex;
+
+    background: rgba(73,155,234,1);
+    background: -moz-linear-gradient(left, rgba(73,155,234,1) 0%, rgba(32,124,229,1) 100%);
+    background: -webkit-gradient(left top, right top, color-stop(0%, rgba(73,155,234,1)), color-stop(100%, rgba(32,124,229,1)));
+    background: -webkit-linear-gradient(left, rgba(73,155,234,1) 0%, rgba(32,124,229,1) 100%);
+    background: -o-linear-gradient(left, rgba(73,155,234,1) 0%, rgba(32,124,229,1) 100%);
+    background: -ms-linear-gradient(left, rgba(73,155,234,1) 0%, rgba(32,124,229,1) 100%);
+    background: linear-gradient(to right, rgba(73,155,234,1) 0%, rgba(32,124,229,1) 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#499bea', endColorstr='#207ce5', GradientType=1 );
+}
+
+section#puntuacion article {
+    flex-grow: 1;
+    width: 33.33%;
+    min-width: 33.33%;
+}
+
+section#puntuacion article div.datos_puntuacion {
+    font-size: 7vw;
+}
+
+section#puntuacion article:nth-child(2) {
+    background-color: white;
+    color: black;
+
+    border-radius: 0px 0px 50px 50px;
+    -moz-border-radius: 0px 0px 50px 50px;
+    -webkit-border-radius: 0px 0px 50px 50px;
+
+    -webkit-box-shadow: 1px 3px 3px 0px rgba(0,0,0,0.75);
+    -moz-box-shadow: 1px 3px 3px 0px rgba(0,0,0,0.75);
+    box-shadow: 1px 3px 3px 0px rgba(0,0,0,0.75);
+}
+/* END PANEL DE LA PUNTUACIÓN */
+/**************************** */
+
+/**************************** */
+/* PANEL DEL ROSCO */
+article#rosco {
+    padding-left: 5rem;
+    padding-right: 5rem;
+}
+
+article#rosco div {
+    width: 2rem;
+    background-color: blue;
+    border: 2px solid white;
+    color: white;
+    border-radius: 100%;
+}
+
+/* END PANEL DEL ROSCO */
+/**************************** */
+
+/**************************** */
+/* PANEL DEL JUEGO */
+section#juego {
+    width: 100vw;
+    text-align: center;
+}
+
+section#juego article {
+    width: 100%;
+}
+
+section#juego article:nth-child(1) {
+    background-color: red;
+}
+
+.myButton {
+    -moz-box-shadow: 0px 1px 0px 0px #fff6af;
+    -webkit-box-shadow: 0px 1px 0px 0px #fff6af;
+    box-shadow: 0px 1px 0px 0px #fff6af;
+    background:-webkit-gradient(linear, left top, left bottom, color-stop(0.05, #ffec64), color-stop(1, #ffab23));
+    background:-moz-linear-gradient(top, #ffec64 5%, #ffab23 100%);
+    background:-webkit-linear-gradient(top, #ffec64 5%, #ffab23 100%);
+    background:-o-linear-gradient(top, #ffec64 5%, #ffab23 100%);
+    background:-ms-linear-gradient(top, #ffec64 5%, #ffab23 100%);
+    background:linear-gradient(to bottom, #ffec64 5%, #ffab23 100%);
+    filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffec64', endColorstr='#ffab23',GradientType=0);
+    background-color:#ffec64;
+    -moz-border-radius:6px;
+    -webkit-border-radius:6px;
+    border-radius:6px;
+    border:1px solid #ffaa22;
+    display:inline-block;
+    cursor:pointer;
+    color:#333333;
+    font-family:Arial;
+    font-weight:bold;
+    padding: 1ex 0px;
+    text-decoration:none;
+    text-shadow:0px 1px 0px #ffee66;
+}
+.myButton:hover {
+    background:-webkit-gradient(linear, left top, left bottom, color-stop(0.05, #ffab23), color-stop(1, #ffec64));
+    background:-moz-linear-gradient(top, #ffab23 5%, #ffec64 100%);
+    background:-webkit-linear-gradient(top, #ffab23 5%, #ffec64 100%);
+    background:-o-linear-gradient(top, #ffab23 5%, #ffec64 100%);
+    background:-ms-linear-gradient(top, #ffab23 5%, #ffec64 100%);
+    background:linear-gradient(to bottom, #ffab23 5%, #ffec64 100%);
+    filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffab23', endColorstr='#ffec64',GradientType=0);
+    background-color:#ffab23;
+}
+.myButton:active {
+    position:relative;
+    top:1px;
+}
+
+section#juego article#formulario_juego {
+    text-align: center;
+}
+
+section#juego article#formulario_juego table {
+    width: 100%;
+}
+
+section#juego article#formulario_juego table tr td {
+    width: 50%;
+    height: 4ex;
+}
+
+section#juego article#formulario_juego input {
+    margin: 2ex;
+    transform: scale(2);
+}
+
+section#juego article#formulario_juego a {
+    width: 70%;
+    font-size: 4vw;
+}
+/* END PANEL DEL JUEGO */
+/**************************** */
+
+/**************************** */
+/* PANEL DE LOS RECORDS */
+
+section#records {
+    font-size: 5vw;
+}
+
+section#records h4 {
+    text-align: center;
+    margin-top: 3ex;
+    margin-bottom: 2ex;
+    text-decoration: underline;
+}
+
+/* Generic Styling, for Desktops/Laptops */
+section#records table { 
+  width: 100%;
+  border-collapse: collapse; 
+}
+/* Zebra striping */
+section#records tr:nth-of-type(odd) { 
+  background: #eee; 
+}
+section#records th { 
+  background: #333; 
+  color: white; 
+  font-weight: bold; 
+}
+section#records td, section#records th { 
+  padding: 6px; 
+  border: 1px solid #ccc; 
+  text-align: left; 
+}
+
+/* 
+Max width before this PARTICULAR table gets nasty
+This query will take effect for any screen smaller than 760px
+and also iPads specifically.
+*/
+@media 
+only screen and (max-width: 760px),
+(min-device-width: 768px) and (max-device-width: 1024px)  {
+
+    /* Force table to not be like tables anymore */
+    section#records table, section#records thead, section#records tbody, section#records th, 
+    section#records td, section#records tr { 
+        display: block;
+    }
+
+    /* Hide table headers (but not display: none;, for accessibility) */
+    section#records thead tr { 
+        position: absolute;
+        top: -9999px;
+        left: -9999px;
+    }
+
+    section#records tr { border: 1px solid #ccc; }
+
+    section#records td { 
+        /* Behave  like a "row" */
+        border: none;
+        border-bottom: 1px solid #eee; 
+        position: relative;
+        padding-left: 50%; 
+    }
+
+    section#records td:before { 
+        /* Now like a table header */
+        position: absolute;
+        /* Top/left values mimic padding */
+        top: 6px;
+        left: 6px;
+        width: 45%; 
+        padding-right: 10px; 
+        white-space: nowrap;
+    }
+
+    /*
+    Label the data
+    */
+    section#records td:nth-of-type(1):before { content: "Posición"; }
+    section#records td:nth-of-type(2):before { content: "Nombre"; }
+    section#records td:nth-of-type(3):before { content: "Puntos"; }
+    section#records td:nth-of-type(4):before { content: "Tiempo"; }
+    section#records td:nth-of-type(5):before { content: "Fecha"; }
+    
+}
+
+/* END PANEL DE LOS RECORDS */
+/************************************************ */
+
+section#elegir_dificultad {
+    display: none;
+    position: absolute;
+    width: 50vw;
+    height: 500px;
+    top: 20%;
+    left: 25%;
+    background-color: white;
+    font-size: 1.2vw;
+    
+    border-radius: 10px 10px 10px 10px;
+    -moz-border-radius: 10px 10px 10px 10px;
+    -webkit-border-radius: 10px 10px 10px 10px;
+    border: 0px solid #000000;
+    
+    -webkit-box-shadow: 10px 10px 5px 0px rgba(0,0,0,0.75);
+    -moz-box-shadow: 10px 10px 5px 0px rgba(0,0,0,0.75);
+    box-shadow: 10px 10px 5px 0px rgba(0,0,0,0.75);
+}
+
+section#elegir_dificultad article {
+    width: 50%;
+    margin: 0 auto;
+    margin-top: 3ex;
+    text-align: center;
+    background-color: red;
+}
+
+section#elegir_dificultad article#info_juego div.info_datos:first-child {
+    font-size: 3vw;
+}
 
 /* END VISTA DE MÓVIL */
 /************************************************ */
@@ -19,6 +292,93 @@
 /* VISTA DE ESCRITORIO - Dispositivos >= 768 píxeles */
 @media (min-width: 768px) {
     
+    body {  
+        background: rgba(235,233,249,1);
+        background: -moz-linear-gradient(left, rgba(235,233,249,1) 0%, rgba(216,208,239,1) 50%, rgba(206,199,236,1) 51%, rgba(193,191,234,1) 100%);
+        background: -webkit-gradient(left top, right top, color-stop(0%, rgba(235,233,249,1)), color-stop(50%, rgba(216,208,239,1)), color-stop(51%, rgba(206,199,236,1)), color-stop(100%, rgba(193,191,234,1)));
+        background: -webkit-linear-gradient(left, rgba(235,233,249,1) 0%, rgba(216,208,239,1) 50%, rgba(206,199,236,1) 51%, rgba(193,191,234,1) 100%);
+        background: -o-linear-gradient(left, rgba(235,233,249,1) 0%, rgba(216,208,239,1) 50%, rgba(206,199,236,1) 51%, rgba(193,191,234,1) 100%);
+        background: -ms-linear-gradient(left, rgba(235,233,249,1) 0%, rgba(216,208,239,1) 50%, rgba(206,199,236,1) 51%, rgba(193,191,234,1) 100%);
+        background: linear-gradient(to right, rgba(235,233,249,1) 0%, rgba(216,208,239,1) 50%, rgba(206,199,236,1) 51%, rgba(193,191,234,1) 100%);
+        filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ebe9f9', endColorstr='#c1bfea', GradientType=1 );
+    }
+
+    /**************************** */
+    /* PANEL DE LA PUNTUACIÓN */
+    section#puntuacion {
+        font-size: 1.5vw;
+        margin-bottom: 1ex;
+    }
+
+    section#puntuacion article div.datos_puntuacion {
+        font-size: 3vw;
+    }
+    /* END PANEL DE LA PUNTUACIÓN */
+    /**************************** */
+
+    /**************************** */
+    /* PANEL DEL JUEGO */
+
+    section#juego {
+        display: flex;
+        flex-wrap: wrap;
+        font-size: 1.5vw;
+    }
+
+    section#juego article {
+        flex-grow: 1;
+        width: 50%;
+        min-width: 50%;
+    }
+
+    section#juego article:nth-child(1) {
+        background-color: orange;
+    }
+
+    section#juego article#formulario_juego table {
+        width: 90%;
+        margin: 0 auto;
+    }
+
+    section#juego article#formulario_juego table tr td {
+        width: 50%;
+        height: 4ex;
+    }
+
+    section#juego article#formulario_juego input {
+        margin: 2ex;
+        width: 50%;
+        transform: scale(1.5);
+    }
+
+    section#juego article#formulario_juego a {
+        width: 50%;
+        font-size: 1vw;
+    }
+    /* END PANEL DEL JUEGO */
+    /**************************** */
+    
+    /**************************** */
+    /* PANEL DE LOS RECORDS */
+
+    section#records {
+        font-size: 1vw;
+        margin-top: 5ex;
+    }
+    
+    section#records h4 {
+        display: none;
+    }
+    
+    section#records table {
+        width: 90%;
+        margin: 0 auto;
+        background-color: white;
+    }
+
+    /* END PANEL DE LOS RECORDS */
+    /************************************************ */
+
 }
 /* END VISTA DE ESCRITORIO */
 /************************************************ */
