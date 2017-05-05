@@ -49,6 +49,14 @@ section#puntuacion article div.datos_puntuacion {
     font-size: 7vw;
 }
 
+section#puntuacion article div div.datos_puntuacion {
+    display: inline;
+}
+
+section#puntuacion article div span {
+    font-size: 7vw;
+}
+
 section#puntuacion article:nth-child(2) {
     background-color: white;
     color: black;
@@ -73,11 +81,43 @@ article#rosco {
 
 article#rosco div {
     width: 2rem;
-    background-color: blue;
     border: 2px solid white;
     color: white;
     border-radius: 100%;
 }
+
+article#rosco div.fondo_azul {
+    background-color: blue;
+}
+
+article#rosco div.fondo_rojo {
+    background-color: red;
+}
+
+article#rosco div.fondo_amarillo {
+    background-color: yellow;
+    color: black;
+    
+    animation-duration: 4000ms;
+    animation-name: blink;
+    animation-iteration-count: infinite;
+    animation-direction: alternate;
+}
+
+@keyframes blink {
+    0% {
+        background-color: yellow;
+        color: black;
+    }
+    50% {
+        background-color: blue;
+        color: white;
+    }
+    100% {
+        background-color: yellow;
+        color: black;
+    }
+ }
 
 /* END PANEL DEL ROSCO */
 /**************************** */
@@ -97,7 +137,7 @@ section#juego article:nth-child(1) {
     background-color: red;
 }
 
-.myButton {
+.myButton_enabled {
     -moz-box-shadow: 0px 1px 0px 0px #fff6af;
     -webkit-box-shadow: 0px 1px 0px 0px #fff6af;
     box-shadow: 0px 1px 0px 0px #fff6af;
@@ -122,7 +162,7 @@ section#juego article:nth-child(1) {
     text-decoration:none;
     text-shadow:0px 1px 0px #ffee66;
 }
-.myButton:hover {
+.myButton_enabled:hover {
     background:-webkit-gradient(linear, left top, left bottom, color-stop(0.05, #ffab23), color-stop(1, #ffec64));
     background:-moz-linear-gradient(top, #ffab23 5%, #ffec64 100%);
     background:-webkit-linear-gradient(top, #ffab23 5%, #ffec64 100%);
@@ -132,9 +172,33 @@ section#juego article:nth-child(1) {
     filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffab23', endColorstr='#ffec64',GradientType=0);
     background-color:#ffab23;
 }
-.myButton:active {
+.myButton_enabled:active {
     position:relative;
     top:1px;
+}
+
+.myButton_disabled {
+    -moz-box-shadow:inset 1px 1px 0px 0px #ffffff;
+    -webkit-box-shadow:inset 1px 1px 0px 0px #ffffff;
+    box-shadow:inset 1px 1px 0px 0px #ffffff;
+    background:-webkit-gradient( linear, left top, left bottom, color-stop(0.05, #bbb), color-stop(1, #aaa) );
+    background:-moz-linear-gradient( center top, #bbb 5%, #aaa 100% );
+    filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffec64', endColorstr='#ffab23',GradientType=0);
+    background-color:#aaa;
+    -moz-border-radius:6px;
+    -webkit-border-radius:6px;
+    border-radius:6px;
+    border:1px solid #dcdcdc;
+    display:inline-block;
+    cursor:pointer;
+    font-family:Arial Black;
+    color:#333333;
+    font-size:15px;
+    font-weight:bold;
+    padding:6px 24px;
+    text-decoration:none;
+    text-shadow:1px 3px 0px #ccc;
+    box-shadow: 6px 6px 5px 0 rgba(0,0,0,0.4);
 }
 
 section#juego article#formulario_juego {
@@ -253,37 +317,94 @@ only screen and (max-width: 760px),
 /* END PANEL DE LOS RECORDS */
 /************************************************ */
 
+
+/**************************** */
+/* PANEL DE ELECCIÓN DE DIFICULTAD */
+
 section#elegir_dificultad {
-    display: none;
-    position: absolute;
-    width: 50vw;
-    height: 500px;
-    top: 20%;
-    left: 25%;
-    background-color: white;
-    font-size: 1.2vw;
+    position: fixed;
+    width: 100vw;
+    height: 100vh;
+    top: 0%;
+    left: 0%;
+    font-size: 4vw;
     
-    border-radius: 10px 10px 10px 10px;
-    -moz-border-radius: 10px 10px 10px 10px;
-    -webkit-border-radius: 10px 10px 10px 10px;
-    border: 0px solid #000000;
-    
-    -webkit-box-shadow: 10px 10px 5px 0px rgba(0,0,0,0.75);
-    -moz-box-shadow: 10px 10px 5px 0px rgba(0,0,0,0.75);
-    box-shadow: 10px 10px 5px 0px rgba(0,0,0,0.75);
+    background: rgba(73,155,234,1);
+    background: -moz-linear-gradient(left, rgba(73,155,234,1) 0%, rgba(32,124,229,1) 100%);
+    background: -webkit-gradient(left top, right top, color-stop(0%, rgba(73,155,234,1)), color-stop(100%, rgba(32,124,229,1)));
+    background: -webkit-linear-gradient(left, rgba(73,155,234,1) 0%, rgba(32,124,229,1) 100%);
+    background: -o-linear-gradient(left, rgba(73,155,234,1) 0%, rgba(32,124,229,1) 100%);
+    background: -ms-linear-gradient(left, rgba(73,155,234,1) 0%, rgba(32,124,229,1) 100%);
+    background: linear-gradient(to right, rgba(73,155,234,1) 0%, rgba(32,124,229,1) 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#499bea', endColorstr='#207ce5', GradientType=1 );
 }
 
 section#elegir_dificultad article {
-    width: 50%;
+    width: 100%;
     margin: 0 auto;
     margin-top: 3ex;
     text-align: center;
-    background-color: red;
+    color: white;
 }
 
-section#elegir_dificultad article#info_juego div.info_datos:first-child {
+section#elegir_dificultad article#info_juego {
+    display: flex;
+    flex-wrap: wrap;
+    padding-top: 2rem;
+    border-top: 2px solid white;
+}
+
+section#elegir_dificultad article#info_juego div {
+    flex-grow: 1;
+    width: 40%;
+    margin-left: 5%;
+    margin-right: 5%;
+    background-color: black;
+    opacity: 0.4;
+}
+
+section#elegir_dificultad article#info_juego div.info_datos p:first-child {
+    font-size: 7vw;
+}
+
+section#elegir_dificultad article#seleccion_dificultad {
+    margin-top: 2rem;
+    margin-bottom: 2rem;
+    border-bottom: 2px solid white;
+}
+
+section#elegir_dificultad article#seleccion_dificultad p {
+    margin-bottom: 1rem;
+}
+
+section#elegir_dificultad article#seleccion_dificultad p span {
+    width: 40%;
+    margin-left: 1.5rem;
+    margin-right: 0.5rem;
+}
+
+section#elegir_dificultad article#seleccion_dificultad p select {
+    width: 40%;
+    height: 5ex;
+}
+
+section#elegir_dificultad article#seleccion_dificultad a {
+    font-size: 7vw;
+    width: 80%;
+    margin-bottom: 2rem;
+}
+
+article#info_autor {
     font-size: 3vw;
 }
+
+article#info_autor p {
+    text-align: left;
+    padding-left: 1.5rem;
+}
+
+/* END PANEL DE ELECCIÓN DE DIFICULTAD */
+/************************************************ */
 
 /* END VISTA DE MÓVIL */
 /************************************************ */
@@ -313,6 +434,10 @@ section#elegir_dificultad article#info_juego div.info_datos:first-child {
     section#puntuacion article div.datos_puntuacion {
         font-size: 3vw;
     }
+    
+    section#puntuacion article div span {
+        font-size: 3vw;
+    }
     /* END PANEL DE LA PUNTUACIÓN */
     /**************************** */
 
@@ -333,6 +458,11 @@ section#elegir_dificultad article#info_juego div.info_datos:first-child {
 
     section#juego article:nth-child(1) {
         background-color: orange;
+    }
+    
+    section#juego article#formulario_juego {
+        background-color: white;
+        opacity: 0.8;
     }
 
     section#juego article#formulario_juego table {
@@ -377,6 +507,72 @@ section#elegir_dificultad article#info_juego div.info_datos:first-child {
     }
 
     /* END PANEL DE LOS RECORDS */
+    /************************************************ */
+    
+    /**************************** */
+/* PANEL DE ELECCIÓN DE DIFICULTAD */
+
+section#elegir_dificultad {
+        position: absolute;
+        width: 60vw;
+        height: auto;
+        top: 20%;
+        left: 25%;
+        font-size: 1vw;
+        
+        border-radius: 10px 10px 10px 10px;
+        -moz-border-radius: 10px 10px 10px 10px;
+        -webkit-border-radius: 10px 10px 10px 10px;
+        border: 0px solid #000000;
+
+        -webkit-box-shadow: 10px 10px 5px 0px rgba(0,0,0,0.75);
+        -moz-box-shadow: 10px 10px 5px 0px rgba(0,0,0,0.75);
+        box-shadow: 10px 10px 5px 0px rgba(0,0,0,0.75);
+    }
+
+    section#elegir_dificultad article#info_juego {
+        display: inline-flex;
+        padding-top: 2rem;
+    }
+
+    section#elegir_dificultad article#info_juego div {
+        display: inline-block;
+        width: 25%;
+        margin-left: 10%;
+        margin-right: 10%;
+        padding-top: 2rem;
+        padding-bottom: 2rem;
+    }
+
+    section#elegir_dificultad article#info_juego div.info_datos p:first-child {
+        font-size: 2vw;
+    }
+
+    section#elegir_dificultad article#seleccion_dificultad p {
+        margin-bottom: 1rem;
+    }
+
+    section#elegir_dificultad article#seleccion_dificultad p span {
+        margin-left: 0px;
+    }
+
+    section#elegir_dificultad article#seleccion_dificultad p select {
+        width: 20%;
+        height: 4ex;
+    }
+
+    section#elegir_dificultad article#seleccion_dificultad a {
+        font-size: 1vw;
+        width: 32%;
+        margin-bottom: 1rem;
+    }
+
+    article#info_autor {
+        font-size: 1vw;
+        padding-bottom: 2ex;
+    }
+
+    /* END PANEL DE ELECCIÓN DE DIFICULTAD */
     /************************************************ */
 
 }

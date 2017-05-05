@@ -1,0 +1,19 @@
+{
+    "compilerOptions": {
+        "module": "amd",
+        "target": "es5",
+        "noImplicitAny": false,
+        "sourceMap": true,
+        "outFile": "js/index.js"
+    },
+    "files": [
+        "ts/jquery.d.ts",
+        "ts/Lib.ts",
+        "ts/Dificultad.ts",
+        "ts/Respuesta.ts",
+        "ts/Pregunta.ts",
+        "ts/Jugador.ts",
+        "ts/Pasapalabra.ts",
+        "ts/Main.ts"
+    ]
+}
