@@ -231,15 +231,21 @@ class Welcome extends CI_Controller {
     }
     
     public function get_dificultad_seleccionada() {
-        print_r($_REQUEST); print_r($_POST);
+//        print_r($_REQUEST);
+//        print_r($_POST);
         
-        if (isset($_REQUEST['_dificultad_seleccionada'])) {
-            echo 'funciona';
-            echo $_REQUEST['_dificultad_seleccionada'];
-        }
-        else {
-            echo 'no funciona';
-        }
+        $data = json_decode(file_get_contents('php://input'), true);
+        print_r($data);
+        echo $data["_dificultad_seleccionada"];
+        echo "finished";
+        
+//        if (isset($_REQUEST['_dificultad_seleccionada'])) {
+//            echo 'funciona<br>';
+//            echo $_REQUEST['_dificultad_seleccionada'];
+//        }
+//        else {
+//            echo 'no funciona';
+//        }
         //echo json_encode($dificultad);
     }
 	

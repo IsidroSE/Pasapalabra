@@ -38,7 +38,8 @@ function sendAjaxRequest(_type: string, _url: string, _params: string, _callback
     var request = $.ajax({
         type: _type,
         url: BASE_URL + _url,
-        data: _params
+        data: _params,
+        contentType: 'json'
     });
     request.done(function(res) {
         _callback(res);
