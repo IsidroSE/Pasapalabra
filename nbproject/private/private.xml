@@ -5,13 +5,10 @@
         <group>
             <file>file:/C:/xampp/htdocs/Pasapalabra/application/views/frontoffice/vm_grocery_crud.php</file>
             <file>file:/C:/xampp/htdocs/Pasapalabra/application/controllers/Welcome.php</file>
-            <file>file:/C:/xampp/htdocs/Pasapalabra/assets/Webapp/css/index_style.css</file>
-            <file>file:/C:/xampp/htdocs/Pasapalabra/application/config/routes.php</file>
-            <file>file:/C:/xampp/htdocs/Pasapalabra/application/models/Rol_model.php</file>
-            <file>file:/C:/xampp/htdocs/Pasapalabra/.htaccess</file>
+            <file>file:/C:/xampp/htdocs/Pasapalabra/application/models/Modelos_Pasapalabra/Dificultad.php</file>
             <file>file:/C:/xampp/htdocs/Pasapalabra/application/models/Questions_model.php</file>
-            <file>file:/C:/xampp/htdocs/Pasapalabra/application/views/Webapp/login.php</file>
-            <file>file:/C:/xampp/htdocs/Pasapalabra/application/views/Webapp/index.php</file>
+            <file>file:/C:/xampp/htdocs/Pasapalabra/application/models/Modelos_Pasapalabra/OK.php</file>
+            <file>file:/C:/xampp/htdocs/Pasapalabra/application/models/Modelos_Pasapalabra/Pregunta.php</file>
         </group>
     </open-files>
 </project-private>

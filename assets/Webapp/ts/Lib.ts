@@ -24,7 +24,7 @@ let div_tiempo_restante: HTMLElement = document.getElementById("div_tiempo_resta
 //DOM del formulario con las preguntas
 let p_posicion_letra: HTMLElement = document.getElementById("p_posicion_letra");
 let p_pregunta: HTMLElement = document.getElementById("p_pregunta");
-let input_respuesta_pregunta: HTMLElement = document.getElementById("input_respuesta_pregunta");
+let input_respuesta_pregunta: HTMLInputElement = <HTMLInputElement>document.getElementById("input_respuesta_pregunta");
 let btn_saltar: HTMLElement = document.getElementById("boton_saltar");
 let btn_comprobar: HTMLElement = document.getElementById("boton_comprobar");
 
@@ -43,5 +43,13 @@ const PUNTUACION_INCIAL: number = 100;
 //const TIEMPO_INICIAL: number = 300000;
 
 //Selección de dificultad
-let select_dificultad: HTMLElement = document.getElementById("select_dificultad");
+let contenedor_seleccion_dificultad: JQuery = <JQuery>$("section#elegir_dificultad");
+let select_dificultad: HTMLSelectElement = <HTMLSelectElement>document.getElementById("select_dificultad");
 let btn_comenzar: HTMLElement = document.getElementById("boton_seleccion_dificultad");
+
+//Dificultades
+enum Codigo_dificultad {
+    FACIL = 11,
+    NORMAL = 12,
+    DIFICIL = 13
+}

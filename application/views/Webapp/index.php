@@ -74,7 +74,7 @@
                     </tr>
                     <tr>
                         <td colspan="2">
-                            <input type="text" id="input_respuesta_pregunta" />
+                            <input type="text" id="input_respuesta_pregunta" disabled="disabled"/>
                         </td>
                     </tr>
                     <tr>
@@ -162,9 +162,9 @@
                 <p>
                     <span>Dificultad:</span>
                     <select id="select_dificultad">
-                        <option value="1">Fácil</option>
-                        <option value="2" selected="selected">Normal</option>
-                        <option value="3">Difícil</option>
+                        <option value="11">Fácil</option>
+                        <option value="12" selected="selected">Normal</option>
+                        <option value="13">Difícil</option>
                     </select>
                 </p>
                 <a href="#" class="myButton_enabled" id="boton_seleccion_dificultad">Comenzar</a>

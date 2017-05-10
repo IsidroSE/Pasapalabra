@@ -2,6 +2,8 @@
 defined('BASEPATH') OR exit('No direct script access allowed');
 
 class Welcome extends CI_Controller {
+    
+    private $letras_rosco;
 
     /**
      * Index Page for this controller.
@@ -21,7 +23,7 @@ class Welcome extends CI_Controller {
 
 
     public function __construct() {
-    parent::__construct();
+        parent::__construct();
         $this->load->database();
         $this->load->library("grocery_CRUD");
         date_default_timezone_set('Europe/Madrid');
@@ -29,6 +31,14 @@ class Welcome extends CI_Controller {
         $this->load->helper('url');
         $this->load->model("Rol_model");
         $this->load->model("Questions_model");
+        //Clases de Pasapalabra
+        $this->load->model("Modelos_Pasapalabra/Dificultad");
+        $this->load->model("Modelos_Pasapalabra/Pregunta");
+        $this->load->model("Modelos_Pasapalabra/OK");
+        $this->load->model("Modelos_Pasapalabra/Rosco");
+        
+        $this->session->N_USUARIOS = 1;
+        $letras_rosco = range('A', 'Z');
     }
 
     public function index() {
@@ -178,6 +188,8 @@ class Welcome extends CI_Controller {
             $crud->set_theme('datatables');
             $crud->set_table("questions");
 
+            $crud->field_type('question_definition', 'text');
+            $crud->unset_texteditor('question_definition','full_text');
             $crud->field_type('question_difficulty_level','enum', array("Fácil", "Normal", "Difícil"));
 
             $crud   ->display_as('question_letter','Letra')
@@ -230,23 +242,105 @@ class Welcome extends CI_Controller {
         echo json_encode($post);
     }
     
-    public function get_dificultad_seleccionada() {
-//        print_r($_REQUEST);
-//        print_r($_POST);
+    public function test() {
+//        $post = $this->Questions_model->getQuestion("A", "Normal");
+//        echo $post->get_definicion();
+        echo Dificultad::FACIL;
+    }
+    
+    /*Mediante una petición AJAX desde el cliente, el cual envia un JSON con la 
+     * dificultad elegida por el jugador, crea un rosco de 27 preguntas y le 
+     * devuelve la primera de todas al jugador*/
+    public function empezar_juego() {
         
-        $data = json_decode(file_get_contents('php://input'), true);
-        print_r($data);
-        echo $data["_dificultad_seleccionada"];
-        echo "finished";
+        //Obtiene el JSON obtenido de la petición AJAX
+        $json = file_get_contents('php://input');
         
-//        if (isset($_REQUEST['_dificultad_seleccionada'])) {
-//            echo 'funciona<br>';
-//            echo $_REQUEST['_dificultad_seleccionada'];
-//        }
-//        else {
-//            echo 'no funciona';
-//        }
-        //echo json_encode($dificultad);
+        /*Se le pasa como parámetro un JSON con la dificultad seleccionada y lo 
+         * convierte en objeto.*/
+        $dificultad = Dificultad::createFromJson($json);
+        
+        //Valida si la dificultad enviada es correcta
+        if ($dificultad->get_dificultad_seleccionada() == Dificultad::FACIL || 
+            $dificultad->get_dificultad_seleccionada() == Dificultad::NORMAL ||
+            $dificultad->get_dificultad_seleccionada() == Dificultad::DIFICIL) {
+            
+            //Los datos son correctos
+            $validacion_correcta = true;
+            
+            //Se le asigna una ID al jugador
+            $id_cliente = $this->session->userdata("N_USUARIOS");
+            $this->session->N_USUARIOS = $id_cliente + 1;
+            
+            $letras_rosco = range('A', 'Z');
+            $index_rosco = 0;
+            $dificultad_rosco = $dificultad;
+            
+            $rosco = Rosco::model();
+            $rosco->setLetras($letras_rosco);
+            $rosco->setIndex($index_rosco);
+            $rosco->setDificultad_rosco($dificultad_rosco);
+            
+            $this->session->rosco_jugador = $rosco;
+            
+        }
+        else {
+            //Los datos NO son correctos
+            $validacion_correcta = false;
+            $id_cliente = -1;
+        }
+        
+        //Crearemos un objeto de la clase OK con el resultado de la validación
+        $ok = new OK();
+        $ok->setId_cliente($id_cliente);
+        $ok->set_ok($validacion_correcta);
+        
+        //Enviamos la respuesta al cliente
+        echo json_encode($ok);
+        
+    }
+    
+    public function get_pregunta() {
+        $dificultad = new Dificultad();
+        $dificultad->set_dificultad_seleccionada("Normal");
+        
+        $rosco = new Rosco();
+        $rosco->setLetras(range('A', 'Z'));
+        $rosco->setIndex(0);
+        $rosco->setDificultad_rosco($dificultad);
+        
+        $this->session->rosco_jugador = $rosco;
+        
+        if (isset($this->session->rosco_jugador)) {
+            
+            $rosco_jugador = $this->session->rosco_jugador;
+            $index = $rosco_jugador->getIndex();
+            $letra_actual_rosco = $rosco_jugador->getLetra($index);
+            $dificultad_rosco = $rosco_jugador->getDificultad_rosco();
+            
+            $pregunta = $this->Questions_model->getQuestion($letra_actual_rosco, 
+                $dificultad_rosco->get_dificultad_seleccionada());
+            
+            $rosco_jugador->addPregunta($pregunta);
+            $rosco_jugador->incrementar_index();
+            $this->session->rosco_jugador = $rosco_jugador;
+            
+            //Enviamos la respuesta al cliente
+            echo json_encode($pregunta);
+            
+        }
+        else {
+            
+            //Crearemos un objeto de la clase OK con el resultado de la validación
+            $ok = new OK();
+            $ok->setId_cliente($this->session->N_USUARIOS);
+            $ok->set_ok(false);
+            
+            //Enviamos la respuesta al cliente
+            echo json_encode($ok);
+            
+        }
+        
     }
 	
 }

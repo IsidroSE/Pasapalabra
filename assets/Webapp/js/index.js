@@ -34,8 +34,16 @@ var NUM_INTENTOS_INICIAL = 10;
 var PUNTUACION_INCIAL = 100;
 //const TIEMPO_INICIAL: number = 300000;
 //Selección de dificultad
+var contenedor_seleccion_dificultad = $("section#elegir_dificultad");
 var select_dificultad = document.getElementById("select_dificultad");
 var btn_comenzar = document.getElementById("boton_seleccion_dificultad");
+//Dificultades
+var Codigo_dificultad;
+(function (Codigo_dificultad) {
+    Codigo_dificultad[Codigo_dificultad["FACIL"] = 11] = "FACIL";
+    Codigo_dificultad[Codigo_dificultad["NORMAL"] = 12] = "NORMAL";
+    Codigo_dificultad[Codigo_dificultad["DIFICIL"] = 13] = "DIFICIL";
+})(Codigo_dificultad || (Codigo_dificultad = {}));
 var Dificultad = (function () {
     function Dificultad(dificultad_seleccionada) {
         this._dificultad_seleccionada = dificultad_seleccionada;
@@ -165,11 +173,23 @@ $(document).ready(function () {
     $("a#boton_seleccion_dificultad").click(function (event) {
         event.preventDefault();
         if (pasapalabra.gameState == GameState.GAME_STARTING) {
-            var _dificultad = new Dificultad("Normal");
-            console.log(JSON.stringify(_dificultad));
-            sendAjaxRequest("POST", "get_dificultad_seleccionada", JSON.stringify(_dificultad), function (response) {
-                console.log(response);
-            });
+            var dificultad_seleccionada = get_nombre_dificultad(+select_dificultad.value);
+            if (dificultad_seleccionada != "") {
+                var _dificultad = new Dificultad(dificultad_seleccionada);
+                sendAjaxRequest("POST", "empezar_juego", JSON.stringify(_dificultad), function (response) {
+                    var data = JSON.parse(response);
+                    /*console.log(data);
+                    console.log(data._ok);*/
+                    /*En el caso de que esté todo correcto, prepararemos la interfaz para empezar el juego*/
+                    if (data._ok) {
+                        console.log(contenedor_seleccion_dificultad);
+                        cambiar_estado_juego(GameState.PROCESSING);
+                    }
+                    else {
+                        location.reload();
+                    }
+                });
+            }
         }
     });
     /*
@@ -185,6 +205,21 @@ $(document).ready(function () {
         }
     });*/
 });
+function get_nombre_dificultad(dificultad_seleccionada) {
+    var nombre_dificultad = "";
+    switch (dificultad_seleccionada) {
+        case Codigo_dificultad.FACIL:
+            nombre_dificultad = "Fácil";
+            break;
+        case Codigo_dificultad.NORMAL:
+            nombre_dificultad = "Normal";
+            break;
+        case Codigo_dificultad.DIFICIL:
+            nombre_dificultad = "Difícil";
+            break;
+    }
+    return nombre_dificultad;
+}
 function sendAjaxRequest(_type, _url, _params, _callback) {
     var request = $.ajax({
         type: _type,
@@ -197,8 +232,36 @@ function sendAjaxRequest(_type, _url, _params, _callback) {
     });
     request.fail(function (jqXHR, textStatus) {
         console.error(jqXHR);
-        _callback({ err: true, message: "Request failed: " + textStatus });
+        console.log("Request failed: " + textStatus);
     });
-    /** USING TS-SERIALIZER TO SERIALIZE AND DESERIALIZE JSON OBJECTS */
+}
+function cambiar_estado_juego(estado_juego) {
+    switch (estado_juego) {
+        case GameState.GAME_STARTING:
+            pasapalabra.gameState = GameState.GAME_STARTING;
+            input_respuesta_pregunta.disabled = true;
+            btn_saltar.className = BOTON_DESACTIVADO;
+            btn_comprobar.className = BOTON_DESACTIVADO;
+            break;
+        case GameState.ANSWERING:
+            pasapalabra.gameState = GameState.ANSWERING;
+            input_respuesta_pregunta.disabled = false;
+            btn_saltar.className = BOTON_ACTIVADO;
+            btn_comprobar.className = BOTON_ACTIVADO;
+            break;
+        case GameState.PROCESSING:
+            pasapalabra.gameState = GameState.PROCESSING;
+            input_respuesta_pregunta.disabled = true;
+            btn_saltar.className = BOTON_DESACTIVADO;
+            btn_comprobar.className = BOTON_DESACTIVADO;
+            contenedor_seleccion_dificultad.hide();
+            break;
+        case GameState.GAME_ENDED:
+            pasapalabra.gameState = GameState.GAME_ENDED;
+            input_respuesta_pregunta.disabled = true;
+            btn_saltar.className = BOTON_DESACTIVADO;
+            btn_comprobar.className = BOTON_DESACTIVADO;
+            break;
+    }
 }
 //# sourceMappingURL=index.js.map

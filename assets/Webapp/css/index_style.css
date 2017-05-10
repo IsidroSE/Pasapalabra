@@ -134,7 +134,7 @@ section#juego article {
 }
 
 section#juego article:nth-child(1) {
-    background-color: red;
+    /*background-color: red;*/
 }
 
 .myButton_enabled {
@@ -371,6 +371,7 @@ section#elegir_dificultad article#seleccion_dificultad {
     margin-top: 2rem;
     margin-bottom: 2rem;
     border-bottom: 2px solid white;
+    z-index: 2;
 }
 
 section#elegir_dificultad article#seleccion_dificultad p {
@@ -457,7 +458,7 @@ article#info_autor p {
     }
 
     section#juego article:nth-child(1) {
-        background-color: orange;
+        /*Rosco*/
     }
     
     section#juego article#formulario_juego {
