@@ -2,10 +2,6 @@
 
 class Dificultad extends CI_Model {
     
-    const FACIL = 'Fácil';
-    const NORMAL = 'Normal';
-    const DIFICIL = 'Difícil';
-    
     private $_dificultad_seleccionada;
     
     function __construct() {

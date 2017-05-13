@@ -6,8 +6,12 @@
             <file>file:/C:/xampp/htdocs/Pasapalabra/application/views/frontoffice/vm_grocery_crud.php</file>
             <file>file:/C:/xampp/htdocs/Pasapalabra/application/controllers/Welcome.php</file>
             <file>file:/C:/xampp/htdocs/Pasapalabra/application/models/Modelos_Pasapalabra/Dificultad.php</file>
+            <file>file:/C:/xampp/htdocs/Pasapalabra/application/models/Modelos_Pasapalabra/Jugador.php</file>
+            <file>file:/C:/xampp/htdocs/Pasapalabra/application/libraries/Librerias_Pasapalabra/Config_Pasapalabra.php</file>
             <file>file:/C:/xampp/htdocs/Pasapalabra/application/models/Questions_model.php</file>
+            <file>file:/C:/xampp/htdocs/Pasapalabra/application/config/constants.php</file>
             <file>file:/C:/xampp/htdocs/Pasapalabra/application/models/Modelos_Pasapalabra/OK.php</file>
+            <file>file:/C:/xampp/htdocs/Pasapalabra/application/models/Modelos_Pasapalabra/Rosco.php</file>
             <file>file:/C:/xampp/htdocs/Pasapalabra/application/models/Modelos_Pasapalabra/Pregunta.php</file>
         </group>
     </open-files>

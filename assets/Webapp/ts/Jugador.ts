@@ -4,8 +4,8 @@ class Jugador {
     private _puntuacion: number;
 
     constructor () {
-        this._num_intentos = NUM_INTENTOS_INICIAL;
-        this._puntuacion = PUNTUACION_INCIAL;
+        this._num_intentos = 10;
+        this._puntuacion = 100;
     }
 
     get num_intentos(): number {

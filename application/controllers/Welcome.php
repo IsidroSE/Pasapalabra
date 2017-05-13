@@ -1,6 +1,8 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 
+define('GAMESTATE', 4); 
+
 class Welcome extends CI_Controller {
     
     private $letras_rosco;
@@ -27,18 +29,22 @@ class Welcome extends CI_Controller {
         $this->load->database();
         $this->load->library("grocery_CRUD");
         date_default_timezone_set('Europe/Madrid');
-        $this->load->library('session');
         $this->load->helper('url');
         $this->load->model("Rol_model");
         $this->load->model("Questions_model");
+        
         //Clases de Pasapalabra
         $this->load->model("Modelos_Pasapalabra/Dificultad");
         $this->load->model("Modelos_Pasapalabra/Pregunta");
         $this->load->model("Modelos_Pasapalabra/OK");
         $this->load->model("Modelos_Pasapalabra/Rosco");
+        $this->load->model("Modelos_Pasapalabra/Jugador");
         
+        //Librerías del juego
+        $this->load->library('Librerias_Pasapalabra/Config_Pasapalabra');
+        
+        $this->load->library('session');
         $this->session->N_USUARIOS = 1;
-        $letras_rosco = range('A', 'Z');
     }
 
     public function index() {
@@ -245,7 +251,10 @@ class Welcome extends CI_Controller {
     public function test() {
 //        $post = $this->Questions_model->getQuestion("A", "Normal");
 //        echo $post->get_definicion();
-        echo Dificultad::FACIL;
+//        echo Config_Pasapalabra::GAMESTATE["GAME_STARTING"];
+        echo Config_Pasapalabra::NUM_INTENTOS_INICIAL;
+        echo Config_Pasapalabra::PUNTUACION_INCIAL;
+        
     }
     
     /*Mediante una petición AJAX desde el cliente, el cual envia un JSON con la 
@@ -261,69 +270,78 @@ class Welcome extends CI_Controller {
         $dificultad = Dificultad::createFromJson($json);
         
         //Valida si la dificultad enviada es correcta
-        if ($dificultad->get_dificultad_seleccionada() == Dificultad::FACIL || 
-            $dificultad->get_dificultad_seleccionada() == Dificultad::NORMAL ||
-            $dificultad->get_dificultad_seleccionada() == Dificultad::DIFICIL) {
+        if ($dificultad->get_dificultad_seleccionada() == Config_Pasapalabra::DIFICULTAD["FACIL"] || 
+            $dificultad->get_dificultad_seleccionada() == Config_Pasapalabra::DIFICULTAD["NORMAL"] ||
+            $dificultad->get_dificultad_seleccionada() == Config_Pasapalabra::DIFICULTAD["DIFICIL"]) {
             
-            //Los datos son correctos
-            $validacion_correcta = true;
-            
-            //Se le asigna una ID al jugador
-            $id_cliente = $this->session->userdata("N_USUARIOS");
-            $this->session->N_USUARIOS = $id_cliente + 1;
-            
+            //Se preparan los parámetros del rosco
             $letras_rosco = range('A', 'Z');
-            $index_rosco = 0;
+            $index_rosco = -1;
             $dificultad_rosco = $dificultad;
             
-            $rosco = Rosco::model();
+            //Se crea el rosco
+            $rosco = new $this->Rosco();
             $rosco->setLetras($letras_rosco);
             $rosco->setIndex($index_rosco);
             $rosco->setDificultad_rosco($dificultad_rosco);
             
-            $this->session->rosco_jugador = $rosco;
+            //Se crea el jugador
+            $jugador = new $this->Jugador();
+            $jugador->set_rosco($rosco);
+            $jugador->set_gameState(Config_Pasapalabra::GAMESTATE["PROCESSING"]);
+            $jugador->set_num_intentos(Config_Pasapalabra::NUM_INTENTOS_INICIAL);
+            $jugador->set_puntuacion(Config_Pasapalabra::PUNTUACION_INCIAL);
+            
+            //Guardamos el jugador en una variable de sesión
+            $this->session->JUGADOR = $jugador;
+            
+            //Los datos son correctos
+            $validacion_correcta = true;
             
         }
         else {
             //Los datos NO son correctos
             $validacion_correcta = false;
-            $id_cliente = -1;
         }
         
         //Crearemos un objeto de la clase OK con el resultado de la validación
         $ok = new OK();
-        $ok->setId_cliente($id_cliente);
         $ok->set_ok($validacion_correcta);
         
+        //Creamos un vector donde enviaremos los parámetros necesarios para iniciar el juego
+        $response = array(
+            Config_Pasapalabra::RESPONSE["OK"] => $ok,
+            Config_Pasapalabra::RESPONSE["NUM_INTENTOS"] => $jugador->get_num_intentos(),
+            Config_Pasapalabra::RESPONSE["PUNTUACION"] => $jugador->get_puntuacion()
+        );
+        
         //Enviamos la respuesta al cliente
-        echo json_encode($ok);
+        echo json_encode($response);
         
     }
     
     public function get_pregunta() {
-        $dificultad = new Dificultad();
-        $dificultad->set_dificultad_seleccionada("Normal");
         
-        $rosco = new Rosco();
-        $rosco->setLetras(range('A', 'Z'));
-        $rosco->setIndex(0);
-        $rosco->setDificultad_rosco($dificultad);
-        
-        $this->session->rosco_jugador = $rosco;
-        
-        if (isset($this->session->rosco_jugador)) {
+        //Comprobamos si el jugador existe
+        if (isset($this->session->JUGADOR)) {
             
-            $rosco_jugador = $this->session->rosco_jugador;
+            //Obtenemos la letra  dificultad de la palabra que queramos a obtener
+            $jugador = $this->session->JUGADOR;
+            $rosco_jugador = $jugador->get_rosco();
+            $rosco_jugador->incrementar_index();
             $index = $rosco_jugador->getIndex();
             $letra_actual_rosco = $rosco_jugador->getLetra($index);
             $dificultad_rosco = $rosco_jugador->getDificultad_rosco();
             
+            //Obtenemos la pregunta de la BD
             $pregunta = $this->Questions_model->getQuestion($letra_actual_rosco, 
                 $dificultad_rosco->get_dificultad_seleccionada());
             
+            //Agregamos la pregunta al rosco e incrementamos el index para obtener
             $rosco_jugador->addPregunta($pregunta);
-            $rosco_jugador->incrementar_index();
-            $this->session->rosco_jugador = $rosco_jugador;
+            $jugador->set_rosco($rosco_jugador);
+            $jugador->set_gameState(Config_Pasapalabra::GAMESTATE["ANSWERING"]);
+            $this->session->JUGADOR = $jugador;
             
             //Enviamos la respuesta al cliente
             echo json_encode($pregunta);
@@ -333,7 +351,6 @@ class Welcome extends CI_Controller {
             
             //Crearemos un objeto de la clase OK con el resultado de la validación
             $ok = new OK();
-            $ok->setId_cliente($this->session->N_USUARIOS);
             $ok->set_ok(false);
             
             //Enviamos la respuesta al cliente

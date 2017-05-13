@@ -37,11 +37,6 @@ const FONDO_AZUL: string = "fondo_azul";
 const FONDO_ROJO: string = "fondo_rojo";
 const FONDO_AMARILLO: string = "fondo_amarillo";
 
-//Valores iniciales de la puntuación del jugador
-const NUM_INTENTOS_INICIAL: number = 10;
-const PUNTUACION_INCIAL: number = 100;
-//const TIEMPO_INICIAL: number = 300000;
-
 //Selección de dificultad
 let contenedor_seleccion_dificultad: JQuery = <JQuery>$("section#elegir_dificultad");
 let select_dificultad: HTMLSelectElement = <HTMLSelectElement>document.getElementById("select_dificultad");
@@ -53,3 +48,13 @@ enum Codigo_dificultad {
     NORMAL = 12,
     DIFICIL = 13
 }
+
+//Nombre de los parámetros que enviará el servidor como respuesta
+const RESPONSE: any = {
+    _OK: "_ok",
+    _GAMESTATE: "_gameState",
+    _NUM_INTENTOS: "_num_intentos",
+    _PUNTUACION: "_puntuacion",
+};
+
+//const TIEMPO_INICIAL: number = 300000;

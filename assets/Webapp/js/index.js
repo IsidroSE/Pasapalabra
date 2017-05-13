@@ -29,10 +29,6 @@ var BOTON_DESACTIVADO = "myButton_disabled";
 var FONDO_AZUL = "fondo_azul";
 var FONDO_ROJO = "fondo_rojo";
 var FONDO_AMARILLO = "fondo_amarillo";
-//Valores iniciales de la puntuación del jugador
-var NUM_INTENTOS_INICIAL = 10;
-var PUNTUACION_INCIAL = 100;
-//const TIEMPO_INICIAL: number = 300000;
 //Selección de dificultad
 var contenedor_seleccion_dificultad = $("section#elegir_dificultad");
 var select_dificultad = document.getElementById("select_dificultad");
@@ -44,6 +40,14 @@ var Codigo_dificultad;
     Codigo_dificultad[Codigo_dificultad["NORMAL"] = 12] = "NORMAL";
     Codigo_dificultad[Codigo_dificultad["DIFICIL"] = 13] = "DIFICIL";
 })(Codigo_dificultad || (Codigo_dificultad = {}));
+//Nombre de los parámetros que enviará el servidor como respuesta
+var RESPONSE = {
+    _OK: "_ok",
+    _GAMESTATE: "_gameState",
+    _NUM_INTENTOS: "_num_intentos",
+    _PUNTUACION: "_puntuacion",
+};
+//const TIEMPO_INICIAL: number = 300000; 
 var Dificultad = (function () {
     function Dificultad(dificultad_seleccionada) {
         this._dificultad_seleccionada = dificultad_seleccionada;
@@ -77,9 +81,8 @@ var Respuesta = (function () {
     return Respuesta;
 }());
 var Pregunta = (function () {
-    function Pregunta(letra, dificultad, definicion) {
+    function Pregunta(letra, definicion) {
         this._letra = letra;
-        this._dificultad = dificultad;
         this._definicion = definicion;
     }
     Object.defineProperty(Pregunta.prototype, "letra", {
@@ -88,16 +91,6 @@ var Pregunta = (function () {
         },
         set: function (letra) {
             this._letra = letra;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(Pregunta.prototype, "dificultad", {
-        get: function () {
-            return this._dificultad;
-        },
-        set: function (dificultad) {
-            this._dificultad = dificultad;
         },
         enumerable: true,
         configurable: true
@@ -112,12 +105,16 @@ var Pregunta = (function () {
         enumerable: true,
         configurable: true
     });
+    Pregunta.createFromJson = function (jsonString) {
+        var object = JSON.parse(jsonString);
+        return new Pregunta(object._letra, object._definicion);
+    };
     return Pregunta;
 }());
 var Jugador = (function () {
     function Jugador() {
-        this._num_intentos = NUM_INTENTOS_INICIAL;
-        this._puntuacion = PUNTUACION_INCIAL;
+        this._num_intentos = 10;
+        this._puntuacion = 100;
     }
     Object.defineProperty(Jugador.prototype, "num_intentos", {
         get: function () {
@@ -166,6 +163,16 @@ var Pasapalabra = (function () {
         enumerable: true,
         configurable: true
     });
+    Object.defineProperty(Pasapalabra.prototype, "jugador", {
+        get: function () {
+            return this._jugador;
+        },
+        set: function (jugador) {
+            this._jugador = jugador;
+        },
+        enumerable: true,
+        configurable: true
+    });
     return Pasapalabra;
 }());
 var pasapalabra = new Pasapalabra();
@@ -173,17 +180,17 @@ $(document).ready(function () {
     $("a#boton_seleccion_dificultad").click(function (event) {
         event.preventDefault();
         if (pasapalabra.gameState == GameState.GAME_STARTING) {
+            pasapalabra.gameState = GameState.PROCESSING;
             var dificultad_seleccionada = get_nombre_dificultad(+select_dificultad.value);
             if (dificultad_seleccionada != "") {
                 var _dificultad = new Dificultad(dificultad_seleccionada);
                 sendAjaxRequest("POST", "empezar_juego", JSON.stringify(_dificultad), function (response) {
                     var data = JSON.parse(response);
-                    /*console.log(data);
-                    console.log(data._ok);*/
                     /*En el caso de que esté todo correcto, prepararemos la interfaz para empezar el juego*/
-                    if (data._ok) {
-                        console.log(contenedor_seleccion_dificultad);
-                        cambiar_estado_juego(GameState.PROCESSING);
+                    if (data[RESPONSE._OK]._ok) {
+                        contenedor_seleccion_dificultad.hide();
+                        actualizar_marcadores(data[RESPONSE._NUM_INTENTOS], data[RESPONSE._PUNTUACION]);
+                        obtener_pregunta_rosco();
                     }
                     else {
                         location.reload();
@@ -192,19 +199,12 @@ $(document).ready(function () {
             }
         }
     });
-    /*
-    $.ajax( {
-        type: "GET",
-        url: BASE_URL + "getData",
-        data: "",
-        success: function(data) {
-            console.log(data);
-        },
-        error: function(xhr, exception) {
-            console.log(xhr);
-        }
-    });*/
 });
+function actualizar_marcadores(num_intentos, puntuacion) {
+    pasapalabra.jugador.num_intentos = num_intentos;
+    pasapalabra.jugador.puntuacion = puntuacion;
+    pasapalabra.jugador.mostrar_datos_jugador();
+}
 function get_nombre_dificultad(dificultad_seleccionada) {
     var nombre_dificultad = "";
     switch (dificultad_seleccionada) {
@@ -235,33 +235,30 @@ function sendAjaxRequest(_type, _url, _params, _callback) {
         console.log("Request failed: " + textStatus);
     });
 }
-function cambiar_estado_juego(estado_juego) {
-    switch (estado_juego) {
-        case GameState.GAME_STARTING:
-            pasapalabra.gameState = GameState.GAME_STARTING;
-            input_respuesta_pregunta.disabled = true;
-            btn_saltar.className = BOTON_DESACTIVADO;
-            btn_comprobar.className = BOTON_DESACTIVADO;
-            break;
-        case GameState.ANSWERING:
-            pasapalabra.gameState = GameState.ANSWERING;
-            input_respuesta_pregunta.disabled = false;
-            btn_saltar.className = BOTON_ACTIVADO;
-            btn_comprobar.className = BOTON_ACTIVADO;
-            break;
-        case GameState.PROCESSING:
-            pasapalabra.gameState = GameState.PROCESSING;
-            input_respuesta_pregunta.disabled = true;
-            btn_saltar.className = BOTON_DESACTIVADO;
-            btn_comprobar.className = BOTON_DESACTIVADO;
-            contenedor_seleccion_dificultad.hide();
-            break;
-        case GameState.GAME_ENDED:
-            pasapalabra.gameState = GameState.GAME_ENDED;
-            input_respuesta_pregunta.disabled = true;
-            btn_saltar.className = BOTON_DESACTIVADO;
-            btn_comprobar.className = BOTON_DESACTIVADO;
-            break;
+function gestionar_botones_juego(activar) {
+    input_respuesta_pregunta.disabled = !activar;
+    if (activar) {
+        btn_saltar.className = BOTON_ACTIVADO;
+        btn_comprobar.className = BOTON_ACTIVADO;
     }
+    else {
+        btn_saltar.className = BOTON_DESACTIVADO;
+        btn_comprobar.className = BOTON_DESACTIVADO;
+    }
+}
+function obtener_pregunta_rosco() {
+    if (pasapalabra.gameState == GameState.PROCESSING) {
+        sendAjaxRequest("GET", "get_pregunta", JSON.stringify(""), function (response) {
+            var data = JSON.parse(response);
+            var pregunta = Pregunta.createFromJson(response);
+            mostrar_pregunta(pregunta);
+            pasapalabra.gameState = GameState.ANSWERING;
+            gestionar_botones_juego(true);
+        });
+    }
+}
+function mostrar_pregunta(pregunta) {
+    p_posicion_letra.innerHTML = "Con la " + pregunta.letra + ":";
+    p_pregunta.innerHTML = pregunta.definicion;
 }
 //# sourceMappingURL=index.js.map

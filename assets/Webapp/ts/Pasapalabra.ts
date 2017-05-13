@@ -22,5 +22,13 @@ class Pasapalabra {
     set gameState(gameState: number) {
         this._gameState = gameState;
     }
+
+    get jugador(): Jugador {
+        return this._jugador;
+    }
+
+    set jugador(jugador: Jugador) {
+        this._jugador = jugador;
+    }
     
 }
