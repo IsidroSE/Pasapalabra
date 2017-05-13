@@ -46,6 +46,7 @@ var RESPONSE = {
     _GAMESTATE: "_gameState",
     _NUM_INTENTOS: "_num_intentos",
     _PUNTUACION: "_puntuacion",
+    _PREGUNTA: "_pregunta"
 };
 //const TIEMPO_INICIAL: number = 300000; 
 var Dificultad = (function () {
@@ -105,9 +106,12 @@ var Pregunta = (function () {
         enumerable: true,
         configurable: true
     });
-    Pregunta.createFromJson = function (jsonString) {
-        var object = JSON.parse(jsonString);
-        return new Pregunta(object._letra, object._definicion);
+    Pregunta.createFromObject = function (object) {
+        return new Pregunta(object["_letra"], object["_definicion"]);
+    };
+    Pregunta.prototype.mostrar = function () {
+        p_posicion_letra.innerHTML = "Con la " + this._letra + ":";
+        p_pregunta.innerHTML = this._definicion;
     };
     return Pregunta;
 }());
@@ -235,7 +239,7 @@ function sendAjaxRequest(_type, _url, _params, _callback) {
         console.log("Request failed: " + textStatus);
     });
 }
-function gestionar_botones_juego(activar) {
+function activar_botones_juego(activar) {
     input_respuesta_pregunta.disabled = !activar;
     if (activar) {
         btn_saltar.className = BOTON_ACTIVADO;
@@ -250,15 +254,16 @@ function obtener_pregunta_rosco() {
     if (pasapalabra.gameState == GameState.PROCESSING) {
         sendAjaxRequest("GET", "get_pregunta", JSON.stringify(""), function (response) {
             var data = JSON.parse(response);
-            var pregunta = Pregunta.createFromJson(response);
-            mostrar_pregunta(pregunta);
-            pasapalabra.gameState = GameState.ANSWERING;
-            gestionar_botones_juego(true);
+            if (data[RESPONSE._OK]._ok) {
+                var pregunta = Pregunta.createFromObject(data[RESPONSE._PREGUNTA]);
+                pregunta.mostrar();
+                activar_botones_juego(true);
+                pasapalabra.gameState = GameState.ANSWERING;
+            }
+            else {
+                location.reload();
+            }
         });
     }
-}
-function mostrar_pregunta(pregunta) {
-    p_posicion_letra.innerHTML = "Con la " + pregunta.letra + ":";
-    p_pregunta.innerHTML = pregunta.definicion;
 }
 //# sourceMappingURL=index.js.map

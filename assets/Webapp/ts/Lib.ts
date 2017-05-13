@@ -55,6 +55,7 @@ const RESPONSE: any = {
     _GAMESTATE: "_gameState",
     _NUM_INTENTOS: "_num_intentos",
     _PUNTUACION: "_puntuacion",
+    _PREGUNTA: "_pregunta"
 };
 
 //const TIEMPO_INICIAL: number = 300000;

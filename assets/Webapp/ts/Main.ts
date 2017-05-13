@@ -79,7 +79,7 @@ function sendAjaxRequest(_type: string, _url: string, _params: string, _callback
 }
 
 
-function gestionar_botones_juego(activar: boolean): void {
+function activar_botones_juego(activar: boolean): void {
 
     input_respuesta_pregunta.disabled = !activar;
 
@@ -100,18 +100,17 @@ function obtener_pregunta_rosco(): void {
 
         sendAjaxRequest("GET", "get_pregunta", JSON.stringify(""), function(response) {
             let data: any = JSON.parse(response);
-            let pregunta: Pregunta = Pregunta.createFromJson(response);
-            mostrar_pregunta(pregunta);
-            pasapalabra.gameState = GameState.ANSWERING;
-            gestionar_botones_juego(true);
+            if (data[RESPONSE._OK]._ok) {
+                let pregunta: Pregunta = Pregunta.createFromObject(data[RESPONSE._PREGUNTA]);
+                pregunta.mostrar();
+                activar_botones_juego(true);
+                pasapalabra.gameState = GameState.ANSWERING;
+            }
+            else {
+                location.reload();
+            }
         });
 
     }
 
-}
-
-
-function mostrar_pregunta(pregunta: Pregunta): void {
-    p_posicion_letra.innerHTML = "Con la " + pregunta.letra + ":" ;
-    p_pregunta.innerHTML = pregunta.definicion;
 }

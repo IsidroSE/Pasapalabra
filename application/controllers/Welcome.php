@@ -327,36 +327,52 @@ class Welcome extends CI_Controller {
             
             //Obtenemos la letra  dificultad de la palabra que queramos a obtener
             $jugador = $this->session->JUGADOR;
-            $rosco_jugador = $jugador->get_rosco();
-            $rosco_jugador->incrementar_index();
-            $index = $rosco_jugador->getIndex();
-            $letra_actual_rosco = $rosco_jugador->getLetra($index);
-            $dificultad_rosco = $rosco_jugador->getDificultad_rosco();
             
-            //Obtenemos la pregunta de la BD
-            $pregunta = $this->Questions_model->getQuestion($letra_actual_rosco, 
-                $dificultad_rosco->get_dificultad_seleccionada());
-            
-            //Agregamos la pregunta al rosco e incrementamos el index para obtener
-            $rosco_jugador->addPregunta($pregunta);
-            $jugador->set_rosco($rosco_jugador);
-            $jugador->set_gameState(Config_Pasapalabra::GAMESTATE["ANSWERING"]);
-            $this->session->JUGADOR = $jugador;
-            
-            //Enviamos la respuesta al cliente
-            echo json_encode($pregunta);
-            
+            if ($jugador->get_gameState() == Config_Pasapalabra::GAMESTATE["PROCESSING"]) {
+                
+                $rosco_jugador = $jugador->get_rosco();
+                $rosco_jugador->incrementar_index();
+                $index = $rosco_jugador->getIndex();
+                $letra_actual_rosco = $rosco_jugador->getLetra($index);
+                $dificultad_rosco = $rosco_jugador->getDificultad_rosco();
+
+                //Obtenemos la pregunta de la BD
+                $pregunta = $this->Questions_model->getQuestion($letra_actual_rosco, 
+                    $dificultad_rosco->get_dificultad_seleccionada());
+
+                //Agregamos la pregunta al rosco e incrementamos el index para obtener
+                $rosco_jugador->addPregunta($pregunta);
+                $jugador->set_rosco($rosco_jugador);
+                $jugador->set_gameState(Config_Pasapalabra::GAMESTATE["ANSWERING"]);
+                $this->session->JUGADOR = $jugador;
+                
+                //Todo es correcto
+                $error = false;
+                
+            }
+            else {
+                $error = true;
+            }  
         }
         else {
-            
-            //Crearemos un objeto de la clase OK con el resultado de la validación
-            $ok = new OK();
-            $ok->set_ok(false);
-            
-            //Enviamos la respuesta al cliente
-            echo json_encode($ok);
-            
+            $error = true;  
         }
+        
+        //Crearemos un objeto de la clase OK con el resultado de la validación
+        $ok = new OK();
+        $ok->set_ok(!$error);
+        
+        $response = array(
+            Config_Pasapalabra::RESPONSE["OK"] => $ok,
+            Config_Pasapalabra::RESPONSE["PREGUNTA"] => $pregunta
+        );
+
+        //Enviamos la respuesta al cliente
+        echo json_encode($response);
+        
+    }
+    
+    public function comprobar_pregunta() {
         
     }
 	

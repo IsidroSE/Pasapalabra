@@ -19,7 +19,8 @@ class Config_Pasapalabra extends CI_Model {
         "OK" => "_ok",
         "GAMESTATE" => "_gameState",
         "NUM_INTENTOS" => "_num_intentos",
-        "PUNTUACION" => "_puntuacion"
+        "PUNTUACION" => "_puntuacion",
+        "PREGUNTA" => "_pregunta"
     );
     
     const NUM_INTENTOS_INICIAL = 10;

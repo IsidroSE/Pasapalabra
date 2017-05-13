@@ -24,9 +24,13 @@ class Pregunta {
         this._definicion = definicion;
     }
 
-    public static createFromJson(jsonString: string): Pregunta {
-        let object: any = JSON.parse(jsonString);
-        return new Pregunta(object._letra, object._definicion);
+    public static createFromObject(object: Object): Pregunta {
+        return new Pregunta(object["_letra"], object["_definicion"]);
+    }
+
+    public mostrar(): void {
+        p_posicion_letra.innerHTML = "Con la " + this._letra + ":" ;
+        p_pregunta.innerHTML = this._definicion;
     }
 
 }
