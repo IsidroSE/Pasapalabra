@@ -2,6 +2,7 @@ class Jugador {
 
     private _num_intentos: number;
     private _puntuacion: number;
+    private _pregunta: Pregunta;
 
     constructor () {
         this._num_intentos = 10;
@@ -22,6 +23,14 @@ class Jugador {
 
     set puntuacion(puntuacion: number) {
         this._puntuacion = puntuacion;
+    }
+
+    get pregunta(): Pregunta {
+        return this._pregunta;
+    }
+
+    set pregunta(pregunta: Pregunta) {
+        this._pregunta = pregunta;
     }
 
     public mostrar_datos_jugador(): void {

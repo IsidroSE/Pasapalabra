@@ -1,17 +1,27 @@
 class Respuesta {
 
-    private _acierto: boolean;
+    private _letra: string;
+    private _respuesta: string;
 
-    constructor (acierto: boolean) {
-        this._acierto = acierto;
+    constructor (letra: string, respuesta: string) {
+        this._letra = letra;
+        this._respuesta = respuesta;
     }
 
-    get acierto(): boolean {
-        return this._acierto;
+    get letra(): string {
+        return this._letra;
     }
 
-    set acierto(acierto: boolean) {
-        this._acierto = acierto;
+    set letra(letra: string) {
+        this._letra = letra;
+    }
+
+    get respuesta(): string {
+        return this._respuesta;
+    }
+
+    set respuesta(respuesta: string) {
+        this._respuesta = respuesta;
     }
 
 }

@@ -12,6 +12,7 @@
         "ts/Dificultad.ts",
         "ts/Respuesta.ts",
         "ts/Pregunta.ts",
+        "ts/Acertar.ts",
         "ts/Jugador.ts",
         "ts/Pasapalabra.ts",
         "ts/Main.ts"

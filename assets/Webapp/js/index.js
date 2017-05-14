@@ -20,6 +20,7 @@ var div_tiempo_restante = document.getElementById("div_tiempo_restante");
 var p_posicion_letra = document.getElementById("p_posicion_letra");
 var p_pregunta = document.getElementById("p_pregunta");
 var input_respuesta_pregunta = document.getElementById("input_respuesta_pregunta");
+var div_error_respuesta = document.getElementById("error_respuesta");
 var btn_saltar = document.getElementById("boton_saltar");
 var btn_comprobar = document.getElementById("boton_comprobar");
 //Clases CSS de los Botones
@@ -27,6 +28,7 @@ var BOTON_ACTIVADO = "myButton_enabled";
 var BOTON_DESACTIVADO = "myButton_disabled";
 //CSS del rosco
 var FONDO_AZUL = "fondo_azul";
+var FONDO_VERDE = "fondo_verde";
 var FONDO_ROJO = "fondo_rojo";
 var FONDO_AMARILLO = "fondo_amarillo";
 //Selección de dificultad
@@ -46,7 +48,8 @@ var RESPONSE = {
     _GAMESTATE: "_gameState",
     _NUM_INTENTOS: "_num_intentos",
     _PUNTUACION: "_puntuacion",
-    _PREGUNTA: "_pregunta"
+    _PREGUNTA: "_pregunta",
+    _ACERTAR: "_acertar"
 };
 //const TIEMPO_INICIAL: number = 300000; 
 var Dificultad = (function () {
@@ -66,15 +69,26 @@ var Dificultad = (function () {
     return Dificultad;
 }());
 var Respuesta = (function () {
-    function Respuesta(acierto) {
-        this._acierto = acierto;
+    function Respuesta(letra, respuesta) {
+        this._letra = letra;
+        this._respuesta = respuesta;
     }
-    Object.defineProperty(Respuesta.prototype, "acierto", {
+    Object.defineProperty(Respuesta.prototype, "letra", {
         get: function () {
-            return this._acierto;
+            return this._letra;
         },
-        set: function (acierto) {
-            this._acierto = acierto;
+        set: function (letra) {
+            this._letra = letra;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(Respuesta.prototype, "respuesta", {
+        get: function () {
+            return this._respuesta;
+        },
+        set: function (respuesta) {
+            this._respuesta = respuesta;
         },
         enumerable: true,
         configurable: true
@@ -115,6 +129,36 @@ var Pregunta = (function () {
     };
     return Pregunta;
 }());
+var Acertar = (function () {
+    function Acertar(letra, acertar) {
+        this._letra = letra;
+        this._acertar = acertar;
+    }
+    Object.defineProperty(Acertar.prototype, "letra", {
+        get: function () {
+            return this._letra;
+        },
+        set: function (letra) {
+            this._letra = letra;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(Acertar.prototype, "acertar", {
+        get: function () {
+            return this._acertar;
+        },
+        set: function (acertar) {
+            this._acertar = acertar;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Acertar.createFromObject = function (object) {
+        return new Acertar(object["_letra"], object["_acertar"]);
+    };
+    return Acertar;
+}());
 var Jugador = (function () {
     function Jugador() {
         this._num_intentos = 10;
@@ -136,6 +180,16 @@ var Jugador = (function () {
         },
         set: function (puntuacion) {
             this._puntuacion = puntuacion;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(Jugador.prototype, "pregunta", {
+        get: function () {
+            return this._pregunta;
+        },
+        set: function (pregunta) {
+            this._pregunta = pregunta;
         },
         enumerable: true,
         configurable: true
@@ -203,7 +257,47 @@ $(document).ready(function () {
             }
         }
     });
-});
+    $("a#boton_comprobar").click(function (event) {
+        event.preventDefault();
+        if (pasapalabra.gameState == GameState.ANSWERING) {
+            div_error_respuesta.style.display = "none";
+            pasapalabra.gameState = GameState.PROCESSING;
+            activar_botones_juego(false);
+            if (input_respuesta_pregunta.value.length != 0) {
+                var _respuesta = new Respuesta(pasapalabra.jugador.pregunta.letra, input_respuesta_pregunta.value);
+                sendAjaxRequest("POST", "comprobar_pregunta", JSON.stringify(_respuesta), function (response) {
+                    var data = JSON.parse(response);
+                    if (data[RESPONSE._OK]._ok) {
+                        actualizar_marcadores(data[RESPONSE._NUM_INTENTOS], data[RESPONSE._PUNTUACION]);
+                        var clase_div = void 0;
+                        var solucion = Acertar.createFromObject(data[RESPONSE._ACERTAR]);
+                        if (solucion.acertar) {
+                            clase_div = FONDO_VERDE;
+                        }
+                        else {
+                            clase_div = FONDO_ROJO;
+                        }
+                        document.getElementById(solucion.letra).className = clase_div;
+                        input_respuesta_pregunta.value = "";
+                        obtener_pregunta_rosco();
+                    }
+                });
+            }
+            else {
+                div_error_respuesta.style.display = "block";
+                div_error_respuesta.innerHTML = "La respuesta no puede estar vacía";
+            }
+        }
+    });
+    $("a#boton_saltar").click(function (event) {
+        event.preventDefault();
+        if (pasapalabra.gameState == GameState.ANSWERING) {
+            div_error_respuesta.style.display = "none";
+            pasapalabra.gameState = GameState.PROCESSING;
+            pasapalabra.gameState = GameState.ANSWERING; //borrar esto luego
+        }
+    });
+}); // END $(document).ready();
 function actualizar_marcadores(num_intentos, puntuacion) {
     pasapalabra.jugador.num_intentos = num_intentos;
     pasapalabra.jugador.puntuacion = puntuacion;
@@ -257,6 +351,7 @@ function obtener_pregunta_rosco() {
             if (data[RESPONSE._OK]._ok) {
                 var pregunta = Pregunta.createFromObject(data[RESPONSE._PREGUNTA]);
                 pregunta.mostrar();
+                pasapalabra.jugador.pregunta = pregunta;
                 activar_botones_juego(true);
                 pasapalabra.gameState = GameState.ANSWERING;
             }

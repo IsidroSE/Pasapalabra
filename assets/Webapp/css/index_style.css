@@ -90,6 +90,10 @@ article#rosco div.fondo_azul {
     background-color: blue;
 }
 
+article#rosco div.fondo_verde {
+    background-color: green;
+}
+
 article#rosco div.fondo_rojo {
     background-color: red;
 }
@@ -223,6 +227,18 @@ section#juego article#formulario_juego a {
     width: 70%;
     font-size: 4vw;
 }
+
+section#juego article#formulario_juego div.error {
+    display: none;
+    margin-top: 0.5%;
+    padding-left: 1%;
+    padding-right: 1%;
+    width: 95%;
+    color: red;
+    font-weight: bold;
+    background-color: #FFC6C6;
+}
+
 /* END PANEL DEL JUEGO */
 /**************************** */
 

@@ -31,33 +31,33 @@
 
         <section id="juego">
             <article id="rosco">
-                <div class="fondo_azul">A</div>
-                <div class="fondo_azul">B</div>
-                <div class="fondo_azul">C</div>
-                <div class="fondo_azul">D</div>
-                <div class="fondo_azul">E</div>
-                <div class="fondo_azul">F</div>
-                <div class="fondo_azul">G</div>
-                <div class="fondo_azul">H</div>
-                <div class="fondo_azul">I</div>
-                <div class="fondo_azul">J</div>
-                <div class="fondo_azul">K</div>
-                <div class="fondo_azul">L</div>
-                <div class="fondo_azul">M</div>
-                <div class="fondo_azul">N</div>
-                <div class="fondo_azul">Ñ</div>
-                <div class="fondo_azul">O</div>
-                <div class="fondo_azul">P</div>
-                <div class="fondo_azul">Q</div>
-                <div class="fondo_azul">R</div>
-                <div class="fondo_azul">S</div>
-                <div class="fondo_azul">T</div>
-                <div class="fondo_azul">U</div>
-                <div class="fondo_azul">V</div>
-                <div class="fondo_azul">W</div>
-                <div class="fondo_azul">X</div>
-                <div class="fondo_azul">Y</div>
-                <div class="fondo_azul">Z</div>
+                <div class="fondo_azul" id="A">A</div>
+                <div class="fondo_azul" id="B">B</div>
+                <div class="fondo_azul" id="C">C</div>
+                <div class="fondo_azul" id="D">D</div>
+                <div class="fondo_azul" id="E">E</div>
+                <div class="fondo_azul" id="F">F</div>
+                <div class="fondo_azul" id="G">G</div>
+                <div class="fondo_azul" id="H">H</div>
+                <div class="fondo_azul" id="I">I</div>
+                <div class="fondo_azul" id="J">J</div>
+                <div class="fondo_azul" id="K">K</div>
+                <div class="fondo_azul" id="L">L</div>
+                <div class="fondo_azul" id="M">M</div>
+                <div class="fondo_azul" id="N">N</div>
+                <div class="fondo_azul" id="Ñ">Ñ</div>
+                <div class="fondo_azul" id="O">O</div>
+                <div class="fondo_azul" id="P">P</div>
+                <div class="fondo_azul" id="Q">Q</div>
+                <div class="fondo_azul" id="R">R</div>
+                <div class="fondo_azul" id="S">S</div>
+                <div class="fondo_azul" id="T">T</div>
+                <div class="fondo_azul" id="U">U</div>
+                <div class="fondo_azul" id="V">V</div>
+                <div class="fondo_azul" id="W">W</div>
+                <div class="fondo_azul" id="X">X</div>
+                <div class="fondo_azul" id="Y">Y</div>
+                <div class="fondo_azul" id="Z">Z</div>
             </article>
             <article id="formulario_juego">
                 
@@ -75,6 +75,11 @@
                     <tr>
                         <td colspan="2">
                             <input type="text" id="input_respuesta_pregunta" disabled="disabled"/>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="2">
+                            <div id="error_respuesta" class="error">Esto es un error.</div>
                         </td>
                     </tr>
                     <tr>

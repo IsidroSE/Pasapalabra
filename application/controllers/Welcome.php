@@ -36,6 +36,8 @@ class Welcome extends CI_Controller {
         //Clases de Pasapalabra
         $this->load->model("Modelos_Pasapalabra/Dificultad");
         $this->load->model("Modelos_Pasapalabra/Pregunta");
+        $this->load->model("Modelos_Pasapalabra/Respuesta");
+        $this->load->model("Modelos_Pasapalabra/Acertar");
         $this->load->model("Modelos_Pasapalabra/OK");
         $this->load->model("Modelos_Pasapalabra/Rosco");
         $this->load->model("Modelos_Pasapalabra/Jugador");
@@ -325,11 +327,12 @@ class Welcome extends CI_Controller {
         //Comprobamos si el jugador existe
         if (isset($this->session->JUGADOR)) {
             
-            //Obtenemos la letra  dificultad de la palabra que queramos a obtener
+            
             $jugador = $this->session->JUGADOR;
             
             if ($jugador->get_gameState() == Config_Pasapalabra::GAMESTATE["PROCESSING"]) {
                 
+                //Obtenemos la letra  dificultad de la palabra que queramos a obtener
                 $rosco_jugador = $jugador->get_rosco();
                 $rosco_jugador->incrementar_index();
                 $index = $rosco_jugador->getIndex();
@@ -373,6 +376,106 @@ class Welcome extends CI_Controller {
     }
     
     public function comprobar_pregunta() {
+        
+        $resultado = new $this->Acertar();
+        
+        //Comprobamos si el jugador existe
+        if (isset($this->session->JUGADOR)) {
+            
+            $jugador = $this->session->JUGADOR;
+            
+            if ($jugador->get_gameState() == Config_Pasapalabra::GAMESTATE["ANSWERING"]) {
+                
+                /*Obtenemos la letra de la pregunta para asegurarnos de que el jugador está por la misma
+                pregunta que le hemos asignado y no en otra*/
+                $rosco_jugador = $jugador->get_rosco();
+                $index = $rosco_jugador->getIndex();
+                $preguntas_rosco = $rosco_jugador->getPreguntas();
+                $pregunta_actual_rosco = $preguntas_rosco[$index];
+                
+                
+                //Obtiene el JSON obtenido de la petición AJAX
+                $json = file_get_contents('php://input');
+                
+                //Convertimos el json en la respuesta enviada por el jugador
+                $respuesta = Respuesta::createFromJson($json);
+                
+                //Verificamos si la respuesta es correcta (Por hacer)
+                $acertar = $this->verificar_respuesta($pregunta_actual_rosco, $respuesta);
+                
+                $puntuacion = $jugador->get_puntuacion();
+                
+                if ($acertar) {
+                    $puntuacion += 10;
+                }
+                else {
+                    $puntuacion -= 10;
+                    $num_intentos = $jugador->get_num_intentos();
+                    $num_intentos--;
+                    $jugador->set_num_intentos($num_intentos);
+                }
+                
+                $preguntas_rosco[$index]->set_acertada($acertar);
+                $jugador->set_puntuacion($puntuacion);
+                
+                $jugador->set_gameState(Config_Pasapalabra::GAMESTATE["PROCESSING"]);
+                $this->session->JUGADOR = $jugador;
+                
+                $letra = $respuesta->get_letra();
+                $resultado->set_letra($letra);
+                $resultado->set_acertar($acertar);
+                
+                //Todo es correcto
+                $error = false;
+            }
+            else {
+                $error = true;
+            }
+        }
+        else {
+            $error = true;
+        }
+        
+        //Crearemos un objeto de la clase OK con el resultado de la validación
+        $ok = new OK();
+        $ok->set_ok(!$error);
+        
+        //Creamos un vector donde enviaremos los parámetros necesarios para iniciar el juego
+        $response = array(
+            Config_Pasapalabra::RESPONSE["OK"] => $ok,
+            Config_Pasapalabra::RESPONSE["NUM_INTENTOS"] => $jugador->get_num_intentos(),
+            Config_Pasapalabra::RESPONSE["PUNTUACION"] => $jugador->get_puntuacion(),
+            Config_Pasapalabra::RESPONSE["ACERTAR"] => $resultado
+        );
+        
+        //Enviamos la respuesta al cliente
+        echo json_encode($response);
+        
+    }
+    
+    private function verificar_respuesta($pregunta, $respuesta) {
+        
+        $no_permitidas = array (
+            "á","é","í","ó","ú","Á","É","Í","Ó","Ú","ñ","À","Ã","Ì","Ò","Ù","Ã™",
+            "Ã ","Ã¨","Ã¬","Ã²","Ã¹","ç","Ç","Ã¢","ê","Ã®","Ã´","Ã»","Ã‚","ÃŠ","ÃŽ",
+            "Ã”","Ã›","ü","Ã¶","Ã–","Ã¯","Ã¤","«","Ò","Ã","Ã„","Ã‹");
+        
+        $permitidas = array (
+            "a","e","i","o","u","A","E","I","O","U","n","N","A","E","I","O","U",
+            "a","e","i","o","u","c","C","a","e","i","o","u","A","E","I","O","U",
+            "u","o","O","i","a","e","U","I","A","E");
+        
+        $_solucion = str_replace($no_permitidas, $permitidas ,$pregunta->get_solucion());
+        $_respuesta = str_replace($no_permitidas, $permitidas ,$respuesta->get_respuesta());
+        
+        if (strcasecmp($_solucion, $_respuesta) == 0) {
+            $acertar = true;
+        }
+        else {
+            $acertar = false;
+        }
+        
+        return $acertar;
         
     }
 	

@@ -25,6 +25,7 @@ let div_tiempo_restante: HTMLElement = document.getElementById("div_tiempo_resta
 let p_posicion_letra: HTMLElement = document.getElementById("p_posicion_letra");
 let p_pregunta: HTMLElement = document.getElementById("p_pregunta");
 let input_respuesta_pregunta: HTMLInputElement = <HTMLInputElement>document.getElementById("input_respuesta_pregunta");
+let div_error_respuesta: HTMLElement = document.getElementById("error_respuesta");
 let btn_saltar: HTMLElement = document.getElementById("boton_saltar");
 let btn_comprobar: HTMLElement = document.getElementById("boton_comprobar");
 
@@ -34,6 +35,7 @@ const BOTON_DESACTIVADO: string = "myButton_disabled";
 
 //CSS del rosco
 const FONDO_AZUL: string = "fondo_azul";
+const FONDO_VERDE: string = "fondo_verde";
 const FONDO_ROJO: string = "fondo_rojo";
 const FONDO_AMARILLO: string = "fondo_amarillo";
 
@@ -55,7 +57,8 @@ const RESPONSE: any = {
     _GAMESTATE: "_gameState",
     _NUM_INTENTOS: "_num_intentos",
     _PUNTUACION: "_puntuacion",
-    _PREGUNTA: "_pregunta"
+    _PREGUNTA: "_pregunta",
+    _ACERTAR: "_acertar"
 };
 
 //const TIEMPO_INICIAL: number = 300000;

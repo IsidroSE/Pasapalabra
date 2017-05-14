@@ -21,7 +21,7 @@ class Rosco extends CI_Model {
         $this->preguntas = $preguntas;
     }
     
-    function addPregunta($pregunta) { print_r($this->preguntas);
+    function addPregunta($pregunta) {
         $this->preguntas[] = $pregunta;
     }
     

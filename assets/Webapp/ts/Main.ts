@@ -28,14 +28,65 @@ $(document).ready(function() {
                         location.reload();
                     }
                 });
+            }
+        }
+    });
 
+
+    $( "a#boton_comprobar" ).click(function(event) {
+        event.preventDefault();
+
+        if (pasapalabra.gameState == GameState.ANSWERING) {
+
+            div_error_respuesta.style.display = "none";
+            pasapalabra.gameState = GameState.PROCESSING;
+            activar_botones_juego(false);
+
+            if (input_respuesta_pregunta.value.length != 0) {
+                let _respuesta: Respuesta = new Respuesta(pasapalabra.jugador.pregunta.letra, input_respuesta_pregunta.value);
+                
+                sendAjaxRequest("POST", "comprobar_pregunta", JSON.stringify(_respuesta), function(response) {
+                    let data: any = JSON.parse(response);
+                    
+                    if (data[RESPONSE._OK]._ok) {
+                        actualizar_marcadores(data[RESPONSE._NUM_INTENTOS], data[RESPONSE._PUNTUACION]);
+                        let clase_div: string;
+                        let solucion: Acertar = Acertar.createFromObject(data[RESPONSE._ACERTAR]);
+                        if (solucion.acertar) {
+                            clase_div = FONDO_VERDE;
+                        }
+                        else {
+                            clase_div = FONDO_ROJO;
+                        }
+                        document.getElementById(solucion.letra).className = clase_div;
+                        input_respuesta_pregunta.value = "";
+                        obtener_pregunta_rosco();
+                    }
+                });
+            }
+            else {
+                div_error_respuesta.style.display = "block";
+                div_error_respuesta.innerHTML = "La respuesta no puede estar vacía";
             }
 
         }
-
+    
     });
 
-});
+    $( "a#boton_saltar" ).click(function(event) { 
+        event.preventDefault();
+
+        if (pasapalabra.gameState == GameState.ANSWERING) {
+
+            div_error_respuesta.style.display = "none";
+            pasapalabra.gameState = GameState.PROCESSING;
+
+            pasapalabra.gameState = GameState.ANSWERING; //borrar esto luego
+
+        }
+    });
+
+}); // END $(document).ready();
 
 
 function actualizar_marcadores(num_intentos: number, puntuacion: number) {
@@ -103,6 +154,7 @@ function obtener_pregunta_rosco(): void {
             if (data[RESPONSE._OK]._ok) {
                 let pregunta: Pregunta = Pregunta.createFromObject(data[RESPONSE._PREGUNTA]);
                 pregunta.mostrar();
+                pasapalabra.jugador.pregunta = pregunta;
                 activar_botones_juego(true);
                 pasapalabra.gameState = GameState.ANSWERING;
             }
