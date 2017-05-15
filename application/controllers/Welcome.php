@@ -260,15 +260,15 @@ class Welcome extends CI_Controller {
     }
     
     /*Mediante una petición AJAX desde el cliente, el cual envia un JSON con la 
-     * dificultad elegida por el jugador, crea un rosco de 27 preguntas y le 
-     * devuelve la primera de todas al jugador*/
+     * dificultad elegida por el jugador, crea un rosco vacío que iremos llenando
+     * conforme avance el juego.*/
     public function empezar_juego() {
         
-        //Obtiene el JSON obtenido de la petición AJAX
+        //Obtiene el JSON recibido de la petición AJAX
         $json = file_get_contents('php://input');
         
         /*Se le pasa como parámetro un JSON con la dificultad seleccionada y lo 
-         * convierte en objeto.*/
+         * convierte en un objeto Dificultad.*/
         $dificultad = Dificultad::createFromJson($json);
         
         //Valida si la dificultad enviada es correcta
@@ -322,14 +322,18 @@ class Welcome extends CI_Controller {
         
     }
     
+    
+    /*Petición de tipo GET que enviará el cliente mediante AJAX para obtener la siguiente pregunta. El método
+    se encargará de buscar la pregunta correspondiente según la letra por la que vaya el jugador.*/
     public function get_pregunta() {
         
         //Comprobamos si el jugador existe
         if (isset($this->session->JUGADOR)) {
             
-            
+            //Obtenemos el jugador existente
             $jugador = $this->session->JUGADOR;
             
+            //Comprobamos que el jugador está en el estado correcto
             if ($jugador->get_gameState() == Config_Pasapalabra::GAMESTATE["PROCESSING"]) {
                 
                 //Obtenemos la letra  dificultad de la palabra que queramos a obtener
@@ -339,11 +343,11 @@ class Welcome extends CI_Controller {
                 $letra_actual_rosco = $rosco_jugador->getLetra($index);
                 $dificultad_rosco = $rosco_jugador->getDificultad_rosco();
 
-                //Obtenemos la pregunta de la BD
+                /*Obtenemos una pregunta aleatoria de la BD que tenga esta letra y esta dificultad*/
                 $pregunta = $this->Questions_model->getQuestion($letra_actual_rosco, 
                     $dificultad_rosco->get_dificultad_seleccionada());
 
-                //Agregamos la pregunta al rosco e incrementamos el index para obtener
+                //Agregamos la pregunta al rosco, cambiamos su gamestate y guardamos los cambios en la sesión
                 $rosco_jugador->addPregunta($pregunta);
                 $jugador->set_rosco($rosco_jugador);
                 $jugador->set_gameState(Config_Pasapalabra::GAMESTATE["ANSWERING"]);
@@ -365,6 +369,7 @@ class Welcome extends CI_Controller {
         $ok = new OK();
         $ok->set_ok(!$error);
         
+        //Creamos un vector donde enviaremos un objeto ok y una pregunta
         $response = array(
             Config_Pasapalabra::RESPONSE["OK"] => $ok,
             Config_Pasapalabra::RESPONSE["PREGUNTA"] => $pregunta
@@ -377,6 +382,7 @@ class Welcome extends CI_Controller {
     
     public function comprobar_pregunta() {
         
+        //Creamos un objeto acertar donde guardaremos el resultado de la operación
         $resultado = new $this->Acertar();
         
         //Comprobamos si el jugador existe
@@ -400,33 +406,51 @@ class Welcome extends CI_Controller {
                 //Convertimos el json en la respuesta enviada por el jugador
                 $respuesta = Respuesta::createFromJson($json);
                 
-                //Verificamos si la respuesta es correcta (Por hacer)
-                $acertar = $this->verificar_respuesta($pregunta_actual_rosco, $respuesta);
-                
-                $puntuacion = $jugador->get_puntuacion();
-                
-                if ($acertar) {
-                    $puntuacion += 10;
+                /*Comprobamos si la letra de la pregunta que quiere contestar el jugador es la misma que 
+                 * la que tiene el servidor, en el caso de que sea la misma, procederemos a comprobar la
+                 * respuesta, en caso de que sean diferentes querra decir que algo ha salido mal y enviaremos
+                 * un error */
+                if ($pregunta_actual_rosco->get_letra() == $respuesta->get_letra()) {
+                    
+                    //Verificamos si la respuesta es correcta
+                    $acertar = $this->verificar_respuesta($pregunta_actual_rosco, $respuesta);
+                    
+                    //Obtendremos la puntuación del jugador
+                    $puntuacion = $jugador->get_puntuacion();
+                    
+                    /*Comprobaremos si la pregunta fue acertada o no y se actualizaran el número de
+                     *  intentos y puntuaciones */
+                    if ($acertar) {
+                        $puntuacion += 10;
+                    }
+                    else {
+                        $puntuacion -= 10;
+                        $num_intentos = $jugador->get_num_intentos();
+                        $num_intentos--;
+                        $jugador->set_num_intentos($num_intentos);
+                    }
+
+                    //Guardaremos en el rosco si esta pregunta ha sido acertada o no y la puntuación del jugador
+                    $preguntas_rosco[$index]->set_acertada($acertar);
+                    $jugador->set_puntuacion($puntuacion);
+
+                    //Cambiaremos el estado del juego y actualizaremos el jugador en la sesión
+                    $jugador->set_gameState(Config_Pasapalabra::GAMESTATE["PROCESSING"]);
+                    $this->session->JUGADOR = $jugador;
+
+                    /*Obtenemos la letra de la pregunta y lo guardamos en el objeto Acertar 
+                     * creado anteriormente junto con el resultado*/
+                    $letra = $respuesta->get_letra();
+                    $resultado->set_letra($letra);
+                    $resultado->set_acertar($acertar);
+
+                    //Todo es correcto
+                    $error = false;
+                    
                 }
                 else {
-                    $puntuacion -= 10;
-                    $num_intentos = $jugador->get_num_intentos();
-                    $num_intentos--;
-                    $jugador->set_num_intentos($num_intentos);
+                    $error = true;
                 }
-                
-                $preguntas_rosco[$index]->set_acertada($acertar);
-                $jugador->set_puntuacion($puntuacion);
-                
-                $jugador->set_gameState(Config_Pasapalabra::GAMESTATE["PROCESSING"]);
-                $this->session->JUGADOR = $jugador;
-                
-                $letra = $respuesta->get_letra();
-                $resultado->set_letra($letra);
-                $resultado->set_acertar($acertar);
-                
-                //Todo es correcto
-                $error = false;
             }
             else {
                 $error = true;
@@ -440,7 +464,8 @@ class Welcome extends CI_Controller {
         $ok = new OK();
         $ok->set_ok(!$error);
         
-        //Creamos un vector donde enviaremos los parámetros necesarios para iniciar el juego
+        /*Creamos un vector donde enviaremos el número de intentos, puntuación y si se ha acertado 
+         * o no la pregunta para que se actualice en le cliente*/
         $response = array(
             Config_Pasapalabra::RESPONSE["OK"] => $ok,
             Config_Pasapalabra::RESPONSE["NUM_INTENTOS"] => $jugador->get_num_intentos(),
@@ -453,6 +478,8 @@ class Welcome extends CI_Controller {
         
     }
     
+    
+    //Método privado que llamará comprobar_pregunta() para saber si la respuesta y la pregunta son iguales o no
     private function verificar_respuesta($pregunta, $respuesta) {
         
         $no_permitidas = array (
