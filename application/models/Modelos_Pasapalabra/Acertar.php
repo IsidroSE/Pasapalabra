@@ -7,6 +7,7 @@ class Acertar extends CI_Model implements JsonSerializable {
     
     function __construct() {
         parent::__construct();
+        $this->_acertar = null;
     }
     
     function get_letra() {

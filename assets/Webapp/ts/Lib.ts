@@ -58,7 +58,8 @@ const RESPONSE: any = {
     _NUM_INTENTOS: "_num_intentos",
     _PUNTUACION: "_puntuacion",
     _PREGUNTA: "_pregunta",
-    _ACERTAR: "_acertar"
+    _ACERTAR: "_acertar",
+    _GANAR: "_ganar"
 };
 
 //const TIEMPO_INICIAL: number = 300000;

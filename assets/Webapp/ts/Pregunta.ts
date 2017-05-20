@@ -30,6 +30,7 @@ class Pregunta {
 
     public mostrar(): void {
         p_posicion_letra.innerHTML = "Con la " + this._letra + ":" ;
+        document.getElementById(this._letra).className = FONDO_AMARILLO;
         p_pregunta.innerHTML = this._definicion;
     }
 

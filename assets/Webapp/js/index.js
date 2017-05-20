@@ -49,7 +49,8 @@ var RESPONSE = {
     _NUM_INTENTOS: "_num_intentos",
     _PUNTUACION: "_puntuacion",
     _PREGUNTA: "_pregunta",
-    _ACERTAR: "_acertar"
+    _ACERTAR: "_acertar",
+    _GANAR: "_ganar"
 };
 //const TIEMPO_INICIAL: number = 300000; 
 var Dificultad = (function () {
@@ -125,6 +126,7 @@ var Pregunta = (function () {
     };
     Pregunta.prototype.mostrar = function () {
         p_posicion_letra.innerHTML = "Con la " + this._letra + ":";
+        document.getElementById(this._letra).className = FONDO_AMARILLO;
         p_pregunta.innerHTML = this._definicion;
     };
     return Pregunta;
@@ -311,7 +313,24 @@ $(document).ready(function () {
         if (pasapalabra.gameState == GameState.ANSWERING) {
             div_error_respuesta.style.display = "none";
             pasapalabra.gameState = GameState.PROCESSING;
-            pasapalabra.gameState = GameState.ANSWERING; //borrar esto luego
+            activar_botones_juego(false);
+            sendAjaxRequest("GET", "saltar_pregunta", JSON.stringify(""), function (response) {
+                var data = JSON.parse(response);
+                //Si la operación se ha realizado con éxito, continuaremos con el juego
+                if (data[RESPONSE._OK]._ok) {
+                    //Convertimos el objeto recibido en un objeto Acertar
+                    var solucion = Acertar.createFromObject(data[RESPONSE._ACERTAR]);
+                    //Volvemos a poner en azul la letra de la pregunta que vamos a saltarnos
+                    document.getElementById(solucion.letra).className = FONDO_AZUL;
+                    //Dejamos el input vacío
+                    input_respuesta_pregunta.value = "";
+                    //Y obtenemos la siguiente pregunta del rosco
+                    obtener_pregunta_rosco();
+                }
+                else {
+                    location.reload();
+                }
+            });
         }
     });
 }); // END $(document).ready();
@@ -370,17 +389,24 @@ function obtener_pregunta_rosco() {
     if (pasapalabra.gameState == GameState.PROCESSING) {
         sendAjaxRequest("GET", "get_pregunta", JSON.stringify(""), function (response) {
             var data = JSON.parse(response);
+            //Si no se ha producido ningún error...
             if (data[RESPONSE._OK]._ok) {
-                //Creamos un objeto Pregunta a partir de la pregunta recibida por el servidor
-                var pregunta = Pregunta.createFromObject(data[RESPONSE._PREGUNTA]);
-                //Mostramos la pregunta
-                pregunta.mostrar();
-                //Guardamos temporalmente la pregunta para luego saber qué pregunta vamos a contestar
-                pasapalabra.jugador.pregunta = pregunta;
-                /*Activamos los botones del formulario y cambiamos el estado del juego para que el jugador pueda volver a enviar
-                más respuestas*/
-                activar_botones_juego(true);
-                pasapalabra.gameState = GameState.ANSWERING;
+                //Y no se ha acabado el juego
+                if (data[RESPONSE._GANAR]._ganar == null) {
+                    //Creamos un objeto Pregunta a partir de la pregunta recibida por el servidor
+                    var pregunta = Pregunta.createFromObject(data[RESPONSE._PREGUNTA]);
+                    //Mostramos la pregunta
+                    pregunta.mostrar();
+                    //Guardamos temporalmente la pregunta para luego saber qué pregunta vamos a contestar
+                    pasapalabra.jugador.pregunta = pregunta;
+                    /*Activamos los botones del formulario y cambiamos el estado del juego para que el jugador pueda volver a enviar
+                    más respuestas*/
+                    activar_botones_juego(true);
+                    pasapalabra.gameState = GameState.ANSWERING;
+                }
+                else {
+                    console.log("El juego ha acabado.");
+                }
             }
             else {
                 location.reload();

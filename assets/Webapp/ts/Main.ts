@@ -105,8 +105,29 @@ $(document).ready(function() {
 
             div_error_respuesta.style.display = "none";
             pasapalabra.gameState = GameState.PROCESSING;
+            activar_botones_juego(false);
 
-            pasapalabra.gameState = GameState.ANSWERING; //borrar esto luego
+            sendAjaxRequest("GET", "saltar_pregunta", JSON.stringify(""), function(response) {
+                let data: any = JSON.parse(response);
+
+                //Si la operación se ha realizado con éxito, continuaremos con el juego
+                if (data[RESPONSE._OK]._ok) {
+                    
+                    //Convertimos el objeto recibido en un objeto Acertar
+                    let solucion: Acertar = Acertar.createFromObject(data[RESPONSE._ACERTAR]);
+
+                    //Volvemos a poner en azul la letra de la pregunta que vamos a saltarnos
+                    document.getElementById(solucion.letra).className = FONDO_AZUL;
+                    //Dejamos el input vacío
+                    input_respuesta_pregunta.value = "";
+                    //Y obtenemos la siguiente pregunta del rosco
+                    obtener_pregunta_rosco();
+
+                }
+                else {
+                    location.reload();
+                }
+            });
 
         }
     });
@@ -177,21 +198,32 @@ function obtener_pregunta_rosco(): void {
         sendAjaxRequest("GET", "get_pregunta", JSON.stringify(""), function(response) {
             let data: any = JSON.parse(response);
 
+            //Si no se ha producido ningún error...
             if (data[RESPONSE._OK]._ok) {
 
-                //Creamos un objeto Pregunta a partir de la pregunta recibida por el servidor
-                let pregunta: Pregunta = Pregunta.createFromObject(data[RESPONSE._PREGUNTA]);
+                //Y no se ha acabado el juego
+                if (data[RESPONSE._GANAR]._ganar == null) {
+                    
+                    //Creamos un objeto Pregunta a partir de la pregunta recibida por el servidor
+                    let pregunta: Pregunta = Pregunta.createFromObject(data[RESPONSE._PREGUNTA]);
 
-                //Mostramos la pregunta
-                pregunta.mostrar();
+                    //Mostramos la pregunta
+                    pregunta.mostrar();
 
-                //Guardamos temporalmente la pregunta para luego saber qué pregunta vamos a contestar
-                pasapalabra.jugador.pregunta = pregunta;
+                    //Guardamos temporalmente la pregunta para luego saber qué pregunta vamos a contestar
+                    pasapalabra.jugador.pregunta = pregunta;
+                    
+                    /*Activamos los botones del formulario y cambiamos el estado del juego para que el jugador pueda volver a enviar
+                    más respuestas*/
+                    activar_botones_juego(true);
+                    pasapalabra.gameState = GameState.ANSWERING;
+
+                }
+                else {
+                    console.log("El juego ha acabado.");
+                }
+
                 
-                /*Activamos los botones del formulario y cambiamos el estado del juego para que el jugador pueda volver a enviar
-                más respuestas*/
-                activar_botones_juego(true);
-                pasapalabra.gameState = GameState.ANSWERING;
             }
             else {
                 location.reload();

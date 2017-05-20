@@ -64,6 +64,10 @@ class Rosco extends CI_Model {
     function getLetra($index) {
         return $this->letras[$index];
     }
+    
+    function getPregunta($index) {
+        return $this->preguntas[$index];
+    }
 
 }
 

@@ -41,6 +41,7 @@ class Welcome extends CI_Controller {
         $this->load->model("Modelos_Pasapalabra/OK");
         $this->load->model("Modelos_Pasapalabra/Rosco");
         $this->load->model("Modelos_Pasapalabra/Jugador");
+        $this->load->model("Modelos_Pasapalabra/Ganar");
         
         //Librerías del juego
         $this->load->library('Librerias_Pasapalabra/Config_Pasapalabra');
@@ -327,6 +328,9 @@ class Welcome extends CI_Controller {
     se encargará de buscar la pregunta correspondiente según la letra por la que vaya el jugador.*/
     public function get_pregunta() {
         
+        $ganar = new $this->Ganar();
+        $pregunta = null;
+        
         //Comprobamos si el jugador existe
         if (isset($this->session->JUGADOR)) {
             
@@ -336,22 +340,52 @@ class Welcome extends CI_Controller {
             //Comprobamos que el jugador está en el estado correcto
             if ($jugador->get_gameState() == Config_Pasapalabra::GAMESTATE["PROCESSING"]) {
                 
-                //Obtenemos la letra  dificultad de la palabra que queramos a obtener
+                //Obtenemos la letra de la palabra que queramos a obtener
                 $rosco_jugador = $jugador->get_rosco();
-                $rosco_jugador->incrementar_index();
-                $index = $rosco_jugador->getIndex();
-                $letra_actual_rosco = $rosco_jugador->getLetra($index);
-                $dificultad_rosco = $rosco_jugador->getDificultad_rosco();
+                $letra_actual_rosco = $this->buscar_letra_siguiente($rosco_jugador);
+                
+                //Si el rosco no esta lleno, extraeremos una nueva pregunta de la base de datos
+                if ($letra_actual_rosco != "") {
+                    
+                    $dificultad_rosco = $rosco_jugador->getDificultad_rosco();
 
-                /*Obtenemos una pregunta aleatoria de la BD que tenga esta letra y esta dificultad*/
-                $pregunta = $this->Questions_model->getQuestion($letra_actual_rosco, 
-                    $dificultad_rosco->get_dificultad_seleccionada());
+                    /*Obtenemos una pregunta aleatoria de la BD que tenga esta letra y esta dificultad*/
+                    $pregunta = $this->Questions_model->getQuestion($letra_actual_rosco, 
+                        $dificultad_rosco->get_dificultad_seleccionada());
 
-                //Agregamos la pregunta al rosco, cambiamos su gamestate y guardamos los cambios en la sesión
-                $rosco_jugador->addPregunta($pregunta);
-                $jugador->set_rosco($rosco_jugador);
-                $jugador->set_gameState(Config_Pasapalabra::GAMESTATE["ANSWERING"]);
-                $this->session->JUGADOR = $jugador;
+                    //Agregamos la pregunta al rosco, cambiamos su gamestate y guardamos los cambios en la sesión
+                    $rosco_jugador->addPregunta($pregunta);
+                    $jugador->set_rosco($rosco_jugador);
+                    $jugador->set_gameState(Config_Pasapalabra::GAMESTATE["ANSWERING"]);
+                    $this->session->JUGADOR = $jugador;
+                    
+                }
+                //Si el rosco ya está lleno, buscaremos la siguiente pregunta sin contestar en el rosco
+                else {
+                    
+                    $rosco_jugador = $this->buscar_pregunta_siguiente($rosco_jugador);
+                    
+                    //Si ha encontrado una pregunta sin contestar, se la pasaremos al jugador
+                    if ($rosco_jugador->getIndex() != null) {
+                        
+                        //Obtenemos el index de la siguiente pregunta sin contestar en el rosco
+                        $index = $rosco_jugador->getIndex();
+                        
+                        //Obtenemos la pregunta con el index indicado
+                        $pregunta = $rosco_jugador->getPregunta($index);
+                        
+                        $jugador->set_rosco($rosco_jugador);
+                        $jugador->set_gameState(Config_Pasapalabra::GAMESTATE["ANSWERING"]);
+                        $this->session->JUGADOR = $jugador;
+                        
+                    }
+                    /*Si no se ha encontrado ninguna, la partida habrá terminado y habrá que comprobar
+                    las preguntas acertadas y falladas para saber el resultado del juego*/
+                    else {
+                        
+                    }
+                    
+                }
                 
                 //Todo es correcto
                 $error = false;
@@ -366,17 +400,66 @@ class Welcome extends CI_Controller {
         }
         
         //Crearemos un objeto de la clase OK con el resultado de la validación
-        $ok = new OK();
+        $ok = new $this->OK();
         $ok->set_ok(!$error);
         
         //Creamos un vector donde enviaremos un objeto ok y una pregunta
         $response = array(
             Config_Pasapalabra::RESPONSE["OK"] => $ok,
-            Config_Pasapalabra::RESPONSE["PREGUNTA"] => $pregunta
+            Config_Pasapalabra::RESPONSE["PREGUNTA"] => $pregunta,
+            Config_Pasapalabra::RESPONSE["GANAR"] => $ganar
         );
 
         //Enviamos la respuesta al cliente
         echo json_encode($response);
+        
+    }
+    
+    /*Busca la letra de la siguiente pregunta en el rosco. En el caso de que el rosco ya esté lleno, 
+     * devolverá un string vacío.*/
+    private function buscar_letra_siguiente($rosco_jugador) {
+        
+        /*En el caso de que el rosco aún no esté completo, incrementaremos el index y lo usaremos para 
+        obtener la siguiente letra del abecedario */
+        if (count($rosco_jugador->getPreguntas()) < count($rosco_jugador->getLetras())) {
+            $rosco_jugador->incrementar_index();
+            $index = $rosco_jugador->getIndex();
+            $letra_actual_rosco = $rosco_jugador->getLetra($index);
+        }
+        else {
+            $letra_actual_rosco = "";
+        }
+        
+        return $letra_actual_rosco;
+        
+    }
+    
+    private function buscar_pregunta_siguiente($rosco_jugador) {
+        
+        $index = $rosco_jugador->getIndex();
+        $preguntas = $rosco_jugador->getPreguntas();
+        
+        $i = $index + 1;
+        $index_siguiente_pregunta = null;
+        while ($index != $i) {
+            
+            if ($preguntas[$i]->get_acertada() == null) {
+                $index_siguiente_pregunta = $i;
+                break;
+            }
+            
+            if ($i + 1 < count($rosco_jugador->getPreguntas())) {
+                $i++;
+            }
+            else {
+                $i = 0;
+            }
+            
+        }
+        
+        $rosco_jugador->setIndex($index_siguiente_pregunta);
+        
+        return $rosco_jugador;
         
     }
     
@@ -503,6 +586,57 @@ class Welcome extends CI_Controller {
         }
         
         return $acertar;
+        
+    }
+    
+    public function saltar_pregunta() {
+        
+        //Creamos un objeto acertar donde guardaremos el resultado de la operación
+        $resultado = new $this->Acertar();
+        
+        //Comprobamos si el jugador existe
+        if (isset($this->session->JUGADOR)) {
+            
+            $jugador = $this->session->JUGADOR;
+            
+            if ($jugador->get_gameState() == Config_Pasapalabra::GAMESTATE["ANSWERING"]) {
+                
+                $rosco_jugador = $jugador->get_rosco();
+                $index = $rosco_jugador->getIndex();
+                $letra = $rosco_jugador->getLetra($index);
+                
+                if ($letra == "Ñ" && $letra == "ñ") {
+                    $letra = "NY";
+                }
+                
+                $resultado->set_letra($letra);
+                
+                //Cambiaremos el estado del juego y actualizaremos el jugador en la sesión
+                $jugador->set_gameState(Config_Pasapalabra::GAMESTATE["PROCESSING"]);
+                $this->session->JUGADOR = $jugador;
+                
+                $error = false;
+                
+            }
+            else {
+                $error = true;
+            }
+        }
+        else {
+            $error = true;
+        }
+        
+        //Crearemos un objeto de la clase OK con el resultado de la validación
+        $ok = new OK();
+        $ok->set_ok(!$error);
+        
+        $response = array(
+            Config_Pasapalabra::RESPONSE["OK"] => $ok,
+            Config_Pasapalabra::RESPONSE["ACERTAR"] => $resultado
+        );
+        
+        //Enviamos la respuesta al cliente
+        echo json_encode($response);
         
     }
 	

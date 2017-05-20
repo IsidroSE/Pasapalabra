@@ -21,7 +21,8 @@ class Config_Pasapalabra extends CI_Model {
         "NUM_INTENTOS" => "_num_intentos",
         "PUNTUACION" => "_puntuacion",
         "PREGUNTA" => "_pregunta",
-        "ACERTAR" => "_acertar"
+        "ACERTAR" => "_acertar",
+        "GANAR" => "_ganar"
     );
     
     const NUM_INTENTOS_INICIAL = 10;

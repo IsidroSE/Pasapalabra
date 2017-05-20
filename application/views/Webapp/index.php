@@ -45,7 +45,7 @@
                 <div class="fondo_azul" id="L">L</div>
                 <div class="fondo_azul" id="M">M</div>
                 <div class="fondo_azul" id="N">N</div>
-                <div class="fondo_azul" id="Ñ">Ñ</div>
+                <div class="fondo_azul" id="NY">Ñ</div>
                 <div class="fondo_azul" id="O">O</div>
                 <div class="fondo_azul" id="P">P</div>
                 <div class="fondo_azul" id="Q">Q</div>
