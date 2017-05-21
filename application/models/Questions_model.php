@@ -21,7 +21,7 @@ class Questions_model extends CI_Model {
         $result = $query->result();
         
         $index = rand(1, count($result));
-        $p = $result[$index-1];
+        $p = $result[$index-1]; 
         
         $pregunta = new Pregunta();
         $pregunta->set_letra($p->question_letter);

@@ -98,6 +98,7 @@ $(document).ready(function() {
     
     });
 
+
     $( "a#boton_saltar" ).click(function(event) { 
         event.preventDefault();
 

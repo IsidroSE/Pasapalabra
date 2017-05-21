@@ -439,14 +439,9 @@ class Welcome extends CI_Controller {
         $index = $rosco_jugador->getIndex();
         $preguntas = $rosco_jugador->getPreguntas();
         
-        $i = $index + 1;
+        $i = $index;
         $index_siguiente_pregunta = null;
-        while ($index != $i) {
-            
-            if ($preguntas[$i]->get_acertada() == null) {
-                $index_siguiente_pregunta = $i;
-                break;
-            }
+        do {
             
             if ($i + 1 < count($rosco_jugador->getPreguntas())) {
                 $i++;
@@ -455,7 +450,12 @@ class Welcome extends CI_Controller {
                 $i = 0;
             }
             
-        }
+            if ($preguntas[$i]->get_acertada() === null) {
+                $index_siguiente_pregunta = $i;
+                break;
+            }
+            
+        } while ($index != $i);
         
         $rosco_jugador->setIndex($index_siguiente_pregunta);
         
@@ -553,7 +553,7 @@ class Welcome extends CI_Controller {
             Config_Pasapalabra::RESPONSE["OK"] => $ok,
             Config_Pasapalabra::RESPONSE["NUM_INTENTOS"] => $jugador->get_num_intentos(),
             Config_Pasapalabra::RESPONSE["PUNTUACION"] => $jugador->get_puntuacion(),
-            Config_Pasapalabra::RESPONSE["ACERTAR"] => $resultado
+            Config_Pasapalabra::RESPONSE["ACERTAR"] => $resultado        
         );
         
         //Enviamos la respuesta al cliente
@@ -604,10 +604,6 @@ class Welcome extends CI_Controller {
                 $rosco_jugador = $jugador->get_rosco();
                 $index = $rosco_jugador->getIndex();
                 $letra = $rosco_jugador->getLetra($index);
-                
-                if ($letra == "Ñ" && $letra == "ñ") {
-                    $letra = "NY";
-                }
                 
                 $resultado->set_letra($letra);
                 
