@@ -221,7 +221,19 @@ function obtener_pregunta_rosco(): void {
 
                 }
                 else {
-                    console.log("El juego ha acabado.");
+
+                    if(data[RESPONSE._GANAR]._ganar) {
+                        div_resultado.className = FONDO_VERDE;
+                        div_resultado.innerHTML = VICTORIA;
+                    }
+                    else {
+                        div_resultado.className = FONDO_ROJO;
+                        div_resultado.innerHTML = DERROTA;
+                    }
+
+                    section_resultado_rosco.show();
+                    pasapalabra.gameState = GameState.ANSWERING;
+                    
                 }
 
                 

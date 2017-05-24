@@ -62,4 +62,20 @@ const RESPONSE: any = {
     _GANAR: "_ganar"
 };
 
+//DOM de la ventana de resultados
+let div_resultado: HTMLElement = document.getElementById("div_resultado");
+let div_resultados_intentos: HTMLElement = document.getElementById("div_resultados_intentos");
+let div_resultados_puntuacion: HTMLElement = document.getElementById("div_resultados_puntuacion");
+let div_resultados_tiempo: HTMLElement = document.getElementById("div_resultados_tiempo");
+let input_nick_introducido: HTMLInputElement = <HTMLInputElement>document.getElementById("input_nick_introducido");
+let btn_guardar_record: HTMLElement = document.getElementById("boton_guardar_record");
+let section_resultado_rosco: JQuery = <JQuery>$("section#resultado_rosco");
+
+//CSS de la ventana de resultados
+//-------------------------------
+
+//Mensajes que se mostrarán al finalizar el juego
+const DERROTA: string = "¡No te quedan intentos para seguir jugando!";
+const VICTORIA: string = "¡Has ganado!";
+
 //const TIEMPO_INICIAL: number = 300000;

@@ -179,6 +179,98 @@
             </article>
             
         </section>
+        
+        <section id="resultados">
+            
+            <section id="resultado_container">
+                <div class="fondo_rojo" id="div_resultado">¡No te quedan intentos para seguir jugando!</div>
+            </section>
+            
+            <section id="formulario_resultado_container">
+            
+                <section id="formulario_resultado">
+
+                    <section id="resultados_puntuacion">
+                        <article>
+                            <div class="resultados_puntuacion" id="div_resultados_puntuacion">000</div>
+                            <div>PUNTOS</div>
+                        </article>
+                        <article>
+                            <div class="resultados_puntuacion" id="div_resultados_tiempo">00:00</div>
+                            <div>TIEMPO</div>
+                        </article>
+                        <article>
+                            <div>
+                                <div class="resultados_puntuacion" id="div_resultados_intentos">00</div>
+                                <span>/10</span>
+                            </div>
+                            <div>NUM. INTENTOS</div>
+                        </article>
+                    </section>
+
+                    <section id="guardar_record">
+                        <article>
+                            <div>¿Quieres guardar tu record?</div>
+                            <input type="text" id="input_nick_introducido" placeholder="Escribe tu nick" />
+                            <a href="#" class="myButton_enabled" id="boton_guardar_record">Guardar</a>
+                        </article>
+                    </section>
+
+                </section>
+
+                <section id="resultado_rosco">
+
+                    <h4>Resultado:</h4>
+
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Letra</th>
+                                <th>Definición</th>
+                                <th>Solución</th>
+                                <th>Acertada</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>A</td>
+                                <td>definicion pregunta</td>
+                                <td>una solucion</td>
+                                <td>V</td>
+                            </tr>
+                            <tr>
+                                <td>B</td>
+                                <td>definicion pregunta</td>
+                                <td>una solucion</td>
+                                <td>V</td>
+                            </tr>
+                            <tr>
+                                <td>C</td>
+                                <td>definicion pregunta</td>
+                                <td>una solucion</td>
+                                <td>V</td>
+                            </tr>
+                            <tr>
+                                <td>D</td>
+                                <td>definicion pregunta</td>
+                                <td>una solucion</td>
+                                <td>V</td>
+                            </tr>
+                            <tr>
+                                <td>E</td>
+                                <td>definicion pregunta</td>
+                                <td>una solucion</td>
+                                <td>V</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                </section>
+
+            </section>
+            
+        </section>
+        
         <script src="<?php echo base_url(); ?>assets/Webapp/js/index.js"></script>
         <?php
         // put your code here

@@ -379,9 +379,20 @@ class Welcome extends CI_Controller {
                         $this->session->JUGADOR = $jugador;
                         
                     }
-                    /*Si no se ha encontrado ninguna, la partida habrá terminado y habrá que comprobar
-                    las preguntas acertadas y falladas para saber el resultado del juego*/
+                    /*Si no se ha encontrado ninguna, la partida habrá terminado y habrá que avisar al jugador
+                     * de que la partida ha terminado */
                     else {
+                        
+                        //Ha ganado
+                        if ($jugador->get_num_intentos() > 0) {
+                            $ganar->set_ganar(true);
+                        }
+                        //Ha perdido
+                        else {
+                            $ganar->set_ganar(false);
+                        }
+                        
+                        $jugador->set_gameState(Config_Pasapalabra::GAMESTATE["GAME_ENDED"]);
                         
                     }
                     

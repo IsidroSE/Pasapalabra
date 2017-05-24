@@ -52,6 +52,19 @@ var RESPONSE = {
     _ACERTAR: "_acertar",
     _GANAR: "_ganar"
 };
+//DOM de la ventana de resultados
+var div_resultado = document.getElementById("div_resultado");
+var div_resultados_intentos = document.getElementById("div_resultados_intentos");
+var div_resultados_puntuacion = document.getElementById("div_resultados_puntuacion");
+var div_resultados_tiempo = document.getElementById("div_resultados_tiempo");
+var input_nick_introducido = document.getElementById("input_nick_introducido");
+var btn_guardar_record = document.getElementById("boton_guardar_record");
+var section_resultado_rosco = $("section#resultado_rosco");
+//CSS de la ventana de resultados
+//-------------------------------
+//Mensajes que se mostrarán al finalizar el juego
+var DERROTA = "¡No te quedan intentos para seguir jugando!";
+var VICTORIA = "¡Has ganado!";
 //const TIEMPO_INICIAL: number = 300000; 
 var Dificultad = (function () {
     function Dificultad(dificultad_seleccionada) {
@@ -405,7 +418,16 @@ function obtener_pregunta_rosco() {
                     pasapalabra.gameState = GameState.ANSWERING;
                 }
                 else {
-                    console.log("El juego ha acabado.");
+                    if (data[RESPONSE._GANAR]._ganar) {
+                        div_resultado.className = FONDO_VERDE;
+                        div_resultado.innerHTML = VICTORIA;
+                    }
+                    else {
+                        div_resultado.className = FONDO_ROJO;
+                        div_resultado.innerHTML = DERROTA;
+                    }
+                    section_resultado_rosco.show();
+                    pasapalabra.gameState = GameState.ANSWERING;
                 }
             }
             else {
