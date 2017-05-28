@@ -17,6 +17,7 @@ var div_num_intentos = document.getElementById("div_num_intentos");
 var div_puntuacion = document.getElementById("div_puntuacion");
 var div_tiempo_restante = document.getElementById("div_tiempo_restante");
 //DOM del formulario con las preguntas
+var article_formulario_juego = $("article#formulario_juego");
 var p_posicion_letra = document.getElementById("p_posicion_letra");
 var p_pregunta = document.getElementById("p_pregunta");
 var input_respuesta_pregunta = document.getElementById("input_respuesta_pregunta");
@@ -46,20 +47,26 @@ var Codigo_dificultad;
 var RESPONSE = {
     _OK: "_ok",
     _GAMESTATE: "_gameState",
+    _JUGADOR: "_jugador",
     _NUM_INTENTOS: "_num_intentos",
     _PUNTUACION: "_puntuacion",
     _PREGUNTA: "_pregunta",
     _ACERTAR: "_acertar",
     _GANAR: "_ganar"
 };
-//DOM de la ventana de resultados
+//DOM de la ventana de guardar record
+var section_guardar_record = $("section#guardar_record_container");
 var div_resultado = document.getElementById("div_resultado");
+var section_resultado_rosco = $("section#resultado_rosco"); // <-- Aquí va la tabla
+var btn_nueva_partida = document.getElementById("boton_nueva_partida");
+//DOM de la sección de resultados
+var article_resultados = $("article#resultados");
 var div_resultados_intentos = document.getElementById("div_resultados_intentos");
 var div_resultados_puntuacion = document.getElementById("div_resultados_puntuacion");
 var div_resultados_tiempo = document.getElementById("div_resultados_tiempo");
 var input_nick_introducido = document.getElementById("input_nick_introducido");
 var btn_guardar_record = document.getElementById("boton_guardar_record");
-var section_resultado_rosco = $("section#resultado_rosco");
+var btn_no_guardar_record = document.getElementById("boton_no_guardar_record");
 //CSS de la ventana de resultados
 //-------------------------------
 //Mensajes que se mostrarán al finalizar el juego
@@ -174,6 +181,78 @@ var Acertar = (function () {
     };
     return Acertar;
 }());
+var Pregunta_completa = (function () {
+    function Pregunta_completa(letra, definicion, solucion, acertada) {
+        this._letra = letra;
+        this._definicion = definicion;
+        this._solucion = solucion;
+        this._acertada = acertada;
+    }
+    Object.defineProperty(Pregunta_completa.prototype, "letra", {
+        get: function () {
+            return this._letra;
+        },
+        set: function (letra) {
+            this._letra = letra;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(Pregunta_completa.prototype, "definicion", {
+        get: function () {
+            return this._definicion;
+        },
+        set: function (definicion) {
+            this._definicion = definicion;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(Pregunta_completa.prototype, "solucion", {
+        get: function () {
+            return this._solucion;
+        },
+        set: function (solucion) {
+            this._solucion = solucion;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(Pregunta_completa.prototype, "acertada", {
+        get: function () {
+            return this._acertada;
+        },
+        set: function (acertada) {
+            this._acertada = acertada;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    return Pregunta_completa;
+}());
+var Resultado_partida = (function () {
+    function Resultado_partida() {
+        this._solucion_preguntas = [];
+    }
+    Object.defineProperty(Resultado_partida.prototype, "solucion_preguntas", {
+        get: function () {
+            return this._solucion_preguntas;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(Resultado_partida.prototype, "letra", {
+        set: function (solucion_preguntas) {
+            this._solucion_preguntas = solucion_preguntas;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Resultado_partida.prototype.agregar_pregunta = function (pregunta) {
+        this._solucion_preguntas.push(pregunta);
+    };
+    return Resultado_partida;
+}());
 var Jugador = (function () {
     function Jugador() {
         this._num_intentos = 10;
@@ -212,6 +291,10 @@ var Jugador = (function () {
     Jugador.prototype.mostrar_datos_jugador = function () {
         div_num_intentos.innerHTML = this._num_intentos + "";
         div_puntuacion.innerHTML = this._puntuacion + "";
+    };
+    Jugador.prototype.mostrar_resultados_jugador = function () {
+        div_resultados_intentos.innerHTML = this._num_intentos + "";
+        div_resultados_puntuacion.innerHTML = this._puntuacion + "";
     };
     return Jugador;
 }());
@@ -266,7 +349,8 @@ $(document).ready(function () {
                     /*En el caso de que esté todo correcto, prepararemos la interfaz para empezar el juego*/
                     if (data[RESPONSE._OK]._ok) {
                         contenedor_seleccion_dificultad.hide();
-                        actualizar_marcadores(data[RESPONSE._NUM_INTENTOS], data[RESPONSE._PUNTUACION]);
+                        var obj = data[RESPONSE._JUGADOR];
+                        actualizar_marcadores(obj[RESPONSE._NUM_INTENTOS], obj[RESPONSE._PUNTUACION]);
                         obtener_pregunta_rosco();
                     }
                     else {
@@ -293,7 +377,8 @@ $(document).ready(function () {
                     var data = JSON.parse(response);
                     //Si la operación se ha realizado con éxito, continuaremos con el juego
                     if (data[RESPONSE._OK]._ok) {
-                        actualizar_marcadores(data[RESPONSE._NUM_INTENTOS], data[RESPONSE._PUNTUACION]);
+                        var obj = data[RESPONSE._JUGADOR];
+                        actualizar_marcadores(obj[RESPONSE._NUM_INTENTOS], obj[RESPONSE._PUNTUACION]);
                         //Convertimos el objeto recibido en un objeto Acertar
                         var solucion = Acertar.createFromObject(data[RESPONSE._ACERTAR]);
                         var clase_div = void 0;
@@ -307,8 +392,17 @@ $(document).ready(function () {
                         document.getElementById(solucion.letra).className = clase_div;
                         //Dejamos el input vacío
                         input_respuesta_pregunta.value = "";
-                        //Y obtenemos la siguiente pregunta del rosco
-                        obtener_pregunta_rosco();
+                        //Comprobaremos si el jugador se ha quedado sin intentos
+                        if (data[RESPONSE._GANAR]._ganar == null) {
+                            //Y obtenemos la siguiente pregunta del rosco
+                            obtener_pregunta_rosco();
+                        }
+                        else {
+                            div_resultado.className = FONDO_ROJO;
+                            div_resultado.innerHTML = DERROTA;
+                            pasapalabra.gameState = GameState.GAME_ENDED;
+                            mostrar_resultados();
+                        }
                     }
                     else {
                         location.reload();
@@ -426,8 +520,8 @@ function obtener_pregunta_rosco() {
                         div_resultado.className = FONDO_ROJO;
                         div_resultado.innerHTML = DERROTA;
                     }
-                    section_resultado_rosco.show();
-                    pasapalabra.gameState = GameState.ANSWERING;
+                    pasapalabra.gameState = GameState.GAME_ENDED;
+                    mostrar_resultados();
                 }
             }
             else {
@@ -435,5 +529,22 @@ function obtener_pregunta_rosco() {
             }
         });
     }
+}
+function mostrar_resultados() {
+    sendAjaxRequest("GET", "obtener_resultados", JSON.stringify(""), function (response) {
+        var data = JSON.parse(response);
+        // console.log(data);
+        var _jugador = data[RESPONSE._JUGADOR];
+        actualizar_resultados(_jugador[RESPONSE._NUM_INTENTOS], _jugador[RESPONSE._PUNTUACION]);
+        section_guardar_record.show();
+        article_formulario_juego.hide();
+        article_resultados.show();
+    });
+}
+//Actualiza los marcadores de puntuación y número de intentos
+function actualizar_resultados(num_intentos, puntuacion) {
+    pasapalabra.jugador.num_intentos = num_intentos;
+    pasapalabra.jugador.puntuacion = puntuacion;
+    pasapalabra.jugador.mostrar_resultados_jugador();
 }
 //# sourceMappingURL=index.js.map

@@ -25,7 +25,8 @@ $(document).ready(function() {
                     /*En el caso de que esté todo correcto, prepararemos la interfaz para empezar el juego*/
                     if (data[RESPONSE._OK]._ok) {
                         contenedor_seleccion_dificultad.hide();
-                        actualizar_marcadores(data[RESPONSE._NUM_INTENTOS], data[RESPONSE._PUNTUACION]);
+                        let obj: Object = data[RESPONSE._JUGADOR];
+                        actualizar_marcadores(obj[RESPONSE._NUM_INTENTOS], obj[RESPONSE._PUNTUACION]);
                         obtener_pregunta_rosco();
                     }
                     //Si ha habido algún error, volveremos a cargar la página
@@ -62,7 +63,8 @@ $(document).ready(function() {
                     //Si la operación se ha realizado con éxito, continuaremos con el juego
                     if (data[RESPONSE._OK]._ok) {
 
-                        actualizar_marcadores(data[RESPONSE._NUM_INTENTOS], data[RESPONSE._PUNTUACION]);
+                        let obj: Object = data[RESPONSE._JUGADOR];
+                        actualizar_marcadores(obj[RESPONSE._NUM_INTENTOS], obj[RESPONSE._PUNTUACION]);
                         //Convertimos el objeto recibido en un objeto Acertar
                         let solucion: Acertar = Acertar.createFromObject(data[RESPONSE._ACERTAR]);
 
@@ -79,8 +81,23 @@ $(document).ready(function() {
                         document.getElementById(solucion.letra).className = clase_div;
                         //Dejamos el input vacío
                         input_respuesta_pregunta.value = "";
-                        //Y obtenemos la siguiente pregunta del rosco
-                        obtener_pregunta_rosco();
+
+                        //Comprobaremos si el jugador se ha quedado sin intentos
+                        if (data[RESPONSE._GANAR]._ganar == null) {
+
+                            //Y obtenemos la siguiente pregunta del rosco
+                            obtener_pregunta_rosco();
+
+                        }
+                        else {
+
+                            div_resultado.className = FONDO_ROJO;
+                            div_resultado.innerHTML = DERROTA;
+                            pasapalabra.gameState = GameState.GAME_ENDED;
+                            mostrar_resultados();
+
+                        }
+
                     }
                     //Si ha habido algún tipo de error, recargaremos la página
                     else {
@@ -230,9 +247,9 @@ function obtener_pregunta_rosco(): void {
                         div_resultado.className = FONDO_ROJO;
                         div_resultado.innerHTML = DERROTA;
                     }
-
-                    section_resultado_rosco.show();
-                    pasapalabra.gameState = GameState.ANSWERING;
+                    
+                    pasapalabra.gameState = GameState.GAME_ENDED;
+                    mostrar_resultados();
                     
                 }
 
@@ -245,4 +262,29 @@ function obtener_pregunta_rosco(): void {
 
     }
 
+}
+
+function mostrar_resultados(): void {
+
+    sendAjaxRequest("GET", "obtener_resultados", JSON.stringify(""), function(response) {
+
+        let data: any = JSON.parse(response);
+        // console.log(data);
+
+        let _jugador: Object = data[RESPONSE._JUGADOR];
+        actualizar_resultados(_jugador[RESPONSE._NUM_INTENTOS], _jugador[RESPONSE._PUNTUACION]);
+
+        section_guardar_record.show();
+        article_formulario_juego.hide();
+        article_resultados.show();
+
+    });
+
+}
+
+//Actualiza los marcadores de puntuación y número de intentos
+function actualizar_resultados(num_intentos: number, puntuacion: number) {
+    pasapalabra.jugador.num_intentos = num_intentos;
+    pasapalabra.jugador.puntuacion = puntuacion;
+    pasapalabra.jugador.mostrar_resultados_jugador();
 }

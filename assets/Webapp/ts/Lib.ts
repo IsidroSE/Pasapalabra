@@ -22,6 +22,7 @@ let div_puntuacion: HTMLElement = document.getElementById("div_puntuacion");
 let div_tiempo_restante: HTMLElement = document.getElementById("div_tiempo_restante");
 
 //DOM del formulario con las preguntas
+let article_formulario_juego: JQuery = <JQuery>$("article#formulario_juego");
 let p_posicion_letra: HTMLElement = document.getElementById("p_posicion_letra");
 let p_pregunta: HTMLElement = document.getElementById("p_pregunta");
 let input_respuesta_pregunta: HTMLInputElement = <HTMLInputElement>document.getElementById("input_respuesta_pregunta");
@@ -55,6 +56,7 @@ enum Codigo_dificultad {
 const RESPONSE: any = {
     _OK: "_ok",
     _GAMESTATE: "_gameState",
+    _JUGADOR: "_jugador",
     _NUM_INTENTOS: "_num_intentos",
     _PUNTUACION: "_puntuacion",
     _PREGUNTA: "_pregunta",
@@ -62,14 +64,20 @@ const RESPONSE: any = {
     _GANAR: "_ganar"
 };
 
-//DOM de la ventana de resultados
+//DOM de la ventana de guardar record
+let section_guardar_record: JQuery = <JQuery>$("section#guardar_record_container");
 let div_resultado: HTMLElement = document.getElementById("div_resultado");
+let section_resultado_rosco: JQuery = <JQuery>$("section#resultado_rosco"); // <-- Aquí va la tabla
+let btn_nueva_partida: HTMLElement = document.getElementById("boton_nueva_partida");
+
+//DOM de la sección de resultados
+let article_resultados: JQuery = <JQuery>$("article#resultados");
 let div_resultados_intentos: HTMLElement = document.getElementById("div_resultados_intentos");
 let div_resultados_puntuacion: HTMLElement = document.getElementById("div_resultados_puntuacion");
 let div_resultados_tiempo: HTMLElement = document.getElementById("div_resultados_tiempo");
 let input_nick_introducido: HTMLInputElement = <HTMLInputElement>document.getElementById("input_nick_introducido");
 let btn_guardar_record: HTMLElement = document.getElementById("boton_guardar_record");
-let section_resultado_rosco: JQuery = <JQuery>$("section#resultado_rosco");
+let btn_no_guardar_record: HTMLElement = document.getElementById("boton_no_guardar_record");
 
 //CSS de la ventana de resultados
 //-------------------------------

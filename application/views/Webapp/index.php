@@ -30,6 +30,7 @@
         </section>
 
         <section id="juego">
+            
             <article id="rosco">
                 <div class="fondo_azul" id="A">A</div>
                 <div class="fondo_azul" id="B">B</div>
@@ -58,17 +59,18 @@
                 <div class="fondo_azul" id="Y">Y</div>
                 <div class="fondo_azul" id="Z">Z</div>
             </article>
+            
             <article id="formulario_juego">
                 
                 <table>
                     <tr>
                         <td colspan="2">
-                            <p id="p_posicion_letra">EMPIEZA POR LA A</p>
+                            <p id="p_posicion_letra">letra</p>
                         </td>
                     </tr>
                     <tr>
                         <td colspan="2">
-                            <p id="p_pregunta">un dels elements de l'opera</p>
+                            <p id="p_pregunta">descrpcion</p>
                         </td>
                     </tr>
                     <tr>
@@ -92,6 +94,66 @@
                 </table>
                 
             </article>
+            
+            <article id="resultados">
+                
+                <section id="resultado_container">
+                    <div id="div_resultado">¡No te quedan intentos para seguir jugando!</div>
+                </section>
+                
+                <section id="resultado_rosco">
+
+                    <h4>Resultado:</h4>
+
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Letra</th>
+                                <th>Definición</th>
+                                <th>Solución</th>
+                                <th>Acertada</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>A</td>
+                                <td>definicion pregunta</td>
+                                <td>una solucion</td>
+                                <td>V</td>
+                            </tr>
+                            <tr>
+                                <td>B</td>
+                                <td>definicion pregunta</td>
+                                <td>una solucion</td>
+                                <td>V</td>
+                            </tr>
+                            <tr>
+                                <td>C</td>
+                                <td>definicion pregunta</td>
+                                <td>una solucion</td>
+                                <td>V</td>
+                            </tr>
+                            <tr>
+                                <td>D</td>
+                                <td>definicion pregunta</td>
+                                <td>una solucion</td>
+                                <td>V</td>
+                            </tr>
+                            <tr>
+                                <td>E</td>
+                                <td>definicion pregunta</td>
+                                <td>una solucion</td>
+                                <td>V</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                </section>
+                
+                <a href="#" class="myButton_enabled" id="boton_nueva_partida">Nueva partida</a>
+                
+            </article>
+            
         </section>
 
         <section id="records">
@@ -180,93 +242,47 @@
             
         </section>
         
-        <section id="resultados">
-            
-            <section id="resultado_container">
-                <div class="fondo_rojo" id="div_resultado">¡No te quedan intentos para seguir jugando!</div>
+        <section id="guardar_record_container">
+
+            <section id="resultados_puntuacion">
+                <article>
+                    <div class="resultados_puntuacion" id="div_resultados_puntuacion">000</div>
+                    <div>PUNTOS</div>
+                </article>
+                <article>
+                    <div class="resultados_puntuacion" id="div_resultados_tiempo">00:00</div>
+                    <div>TIEMPO</div>
+                </article>
+                <article>
+                    <div>
+                        <div class="resultados_puntuacion" id="div_resultados_intentos">00</div>
+                        <span>/10</span>
+                    </div>
+                    <div>NUM. INTENTOS</div>
+                </article>
             </section>
-            
-            <section id="formulario_resultado_container">
-            
-                <section id="formulario_resultado">
 
-                    <section id="resultados_puntuacion">
-                        <article>
-                            <div class="resultados_puntuacion" id="div_resultados_puntuacion">000</div>
-                            <div>PUNTOS</div>
-                        </article>
-                        <article>
-                            <div class="resultados_puntuacion" id="div_resultados_tiempo">00:00</div>
-                            <div>TIEMPO</div>
-                        </article>
-                        <article>
-                            <div>
-                                <div class="resultados_puntuacion" id="div_resultados_intentos">00</div>
-                                <span>/10</span>
-                            </div>
-                            <div>NUM. INTENTOS</div>
-                        </article>
-                    </section>
-
-                    <section id="guardar_record">
-                        <article>
+            <section id="guardar_record">
+                <table>
+                    <tr>
+                        <td colspan="2">
                             <div>¿Quieres guardar tu record?</div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="2">
                             <input type="text" id="input_nick_introducido" placeholder="Escribe tu nick" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <a href="#" class="myButton_enabled" id="boton_no_guardar_record">No guardar</a>
+                        </td>
+                        <td>
                             <a href="#" class="myButton_enabled" id="boton_guardar_record">Guardar</a>
-                        </article>
-                    </section>
-
-                </section>
-
-                <section id="resultado_rosco">
-
-                    <h4>Resultado:</h4>
-
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Letra</th>
-                                <th>Definición</th>
-                                <th>Solución</th>
-                                <th>Acertada</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>A</td>
-                                <td>definicion pregunta</td>
-                                <td>una solucion</td>
-                                <td>V</td>
-                            </tr>
-                            <tr>
-                                <td>B</td>
-                                <td>definicion pregunta</td>
-                                <td>una solucion</td>
-                                <td>V</td>
-                            </tr>
-                            <tr>
-                                <td>C</td>
-                                <td>definicion pregunta</td>
-                                <td>una solucion</td>
-                                <td>V</td>
-                            </tr>
-                            <tr>
-                                <td>D</td>
-                                <td>definicion pregunta</td>
-                                <td>una solucion</td>
-                                <td>V</td>
-                            </tr>
-                            <tr>
-                                <td>E</td>
-                                <td>definicion pregunta</td>
-                                <td>una solucion</td>
-                                <td>V</td>
-                            </tr>
-                        </tbody>
-                    </table>
-
-                </section>
-
+                        </td>
+                    </tr>
+                </table>
             </section>
             
         </section>

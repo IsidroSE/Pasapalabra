@@ -18,8 +18,8 @@ class Config_Pasapalabra extends CI_Model {
     const RESPONSE = array(
         "OK" => "_ok",
         "GAMESTATE" => "_gameState",
-        "NUM_INTENTOS" => "_num_intentos",
-        "PUNTUACION" => "_puntuacion",
+        "JUGADOR" => "_jugador",
+        "ROSCO" => "_rosco",
         "PREGUNTA" => "_pregunta",
         "ACERTAR" => "_acertar",
         "GANAR" => "_ganar"

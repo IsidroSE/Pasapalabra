@@ -1,6 +1,6 @@
 <?php
 
-class Jugador extends CI_Model {
+class Jugador extends CI_Model implements JsonSerializable {
     
     private $_gameState;
     private $_rosco;
@@ -41,6 +41,13 @@ class Jugador extends CI_Model {
 
     function set_puntuacion($_puntuacion) {
         $this->_puntuacion = $_puntuacion;
+    }
+    
+    public function jsonSerialize() {
+        return [
+            '_num_intentos' => $this->_num_intentos,
+            '_puntuacion' => $this->_puntuacion
+        ];
     }
     
 }

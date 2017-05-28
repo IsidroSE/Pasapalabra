@@ -61,6 +61,15 @@ class Pregunta extends CI_Model implements JsonSerializable {
             '_definicion' => $this->_definicion
         ];
     }
+    
+    public function jsonSerialize_all() {
+        return [
+            '_letra' => $this->_letra,
+            '_definicion' => $this->_definicion,
+            '_solucion' => $this->_solucion,
+            '_acertada' => $this->_acertada
+        ];
+    }
 
 }
 

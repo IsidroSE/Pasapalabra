@@ -12,7 +12,6 @@
 /* VISTA DE MÓVIL - Dispositivos < 768 píxeles */
 
 body {
-    width: 100vw;
     font-family: Aclonica;
     font-size: 5vw;
 }
@@ -129,7 +128,7 @@ article#rosco div.fondo_amarillo {
 /**************************** */
 /* PANEL DEL JUEGO */
 section#juego {
-    width: 100vw;
+    width: 100%;
     text-align: center;
 }
 
@@ -261,15 +260,18 @@ section#records table, section#resultado_rosco table {
   width: 100%;
   border-collapse: collapse; 
 }
+
 /* Zebra striping */
 section#records tr:nth-of-type(odd) { 
   background: #eee;
 }
+
 section#records th, section#resultado_rosco th { 
   background: #333; 
   color: white; 
   font-weight: bold; 
 }
+
 section#records td, section#records th, section#resultado_rosco td, section#resultado_rosco th { 
   padding: 6px; 
   border: 1px solid #ccc; 
@@ -341,8 +343,7 @@ only screen and (max-width: 760px),
 
 section#elegir_dificultad {
     position: fixed;
-    width: 100vw;
-    height: 100vh;
+    width: 100%;
     top: 0%;
     left: 0%;
     font-size: 4vw;
@@ -426,12 +427,12 @@ article#info_autor p {
 /************************************************ */
 
 /**************************** */
-/* PANEL DE RESULTADOS */
+/* PANEL DE GUARDAR PARTIDA */
 
-section#resultados { 
-    display: none;
+section#guardar_record_container { 
+    /*display: none;*/
     position: absolute;
-    width: 100vw;
+    width: 100%;
     top: 0%;
     left: 0%;
     font-size: 4vw;
@@ -445,110 +446,82 @@ section#resultados {
     filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#499bea', endColorstr='#207ce5', GradientType=1 );
 }
 
-/* Resultado de la partida */
-section#resultados section#resultado_container {
+/* Guardar record */
+section#guardar_record_container section#guardar_record {
     width: 100%;
-}
-
-section#resultados section#resultado_container div {
-    font-size: 7vw;
-    text-align: center;
-    color: white;
-    opacity: 0.8;
-    padding-top: 1ex;
-    padding-bottom: 1ex;
-}
-
-/* Resultados (puntuacion final) */
-section#resultados section#resultados_puntuacion {
-    width: 100%;
-    display: flex;
-    flex-wrap: wrap;
-    font-size: 3vw;
-    background-color: #585858;
-    opacity: 0.8;
     padding-top: 2ex;
     padding-bottom: 2ex;
 }
 
-section#resultados section article {
-    flex-grow: 1;
-    width: 33.33%;
-    min-width: 33.33%;
-    
+section#guardar_record_container section#guardar_record table {
+    width: 100%;
+    text-align: center;
+    font-size: 7vw;
     color: white;
-    text-align: center;
 }
 
-section#resultados section article div.resultados_puntuacion {
-    font-size: 7vw;
-}
-
-section#resultados section article div div.resultados_puntuacion {
-    display: inline;
-}
-
-section#resultados section article div span {
-    font-size: 7vw;
-}
-
-/* Guardar record */
-section#resultados section#guardar_record {
-    width: 100%;
-    margin-top: 2ex;
-    padding-bottom: 4ex;
-}
-
-section#resultados section#guardar_record article {
-    width: 100%;
-}
-
-section#resultados section#guardar_record * {
-    margin: 0 auto;
-}
-
-section#resultados section#guardar_record div {
-    font-size: 7vw;
-    width: 85%;
-    text-align: center;
-}
-
-section#resultados section#guardar_record input {
+section#guardar_record_container section#guardar_record input {
     display: block;
     margin-top: 4ex;
     margin-bottom: 6ex;
+    margin-left: 12rem;
+    width: 12rem;
     transform: scale(2);
 }
 
-section#resultados section#guardar_record a {
-    width: 10rem;
+section#guardar_record_container section#guardar_record a {
+    font-size: 4vw;
+    width: 12rem;
 }
 
-/* Resultado del rosco de preguntas */
-section#resultado_rosco {
-    font-size: 5vw;
-}
+/* END PANEL DE GUARDAR PARTIDA */
+/************************************************ */
 
-section#resultado_rosco h4 {
+/**************************** */
+/* PANEL DE RESULTADOS */
+
+/* Resultado de la partida */
+
+section#juego article#resultados {
+    display: none;
+    font-size: 7vw;
     text-align: center;
-    margin-top: 3ex;
-    margin-bottom: 2ex;
-    text-decoration: underline;
+    color: white;
+    padding-top: 1ex;
+    padding-bottom: 1ex;
+    
+    background: rgba(73,155,234,1);
+    background: -moz-linear-gradient(left, rgba(73,155,234,1) 0%, rgba(32,124,229,1) 100%);
+    background: -webkit-gradient(left top, right top, color-stop(0%, rgba(73,155,234,1)), color-stop(100%, rgba(32,124,229,1)));
+    background: -webkit-linear-gradient(left, rgba(73,155,234,1) 0%, rgba(32,124,229,1) 100%);
+    background: -o-linear-gradient(left, rgba(73,155,234,1) 0%, rgba(32,124,229,1) 100%);
+    background: -ms-linear-gradient(left, rgba(73,155,234,1) 0%, rgba(32,124,229,1) 100%);
+    background: linear-gradient(to right, rgba(73,155,234,1) 0%, rgba(32,124,229,1) 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#499bea', endColorstr='#207ce5', GradientType=1 );
+}
+
+article#resultados section#resultado_container {
+    font-size: 7vw;
+    opacity: 0.8;
 }
 
 /* Generic Styling, for Desktops/Laptops */
-section#resultado_rosco {
+article#resultados section#resultado_rosco {
     font-size: 5vw;
     padding-top: 0.5ex;
     padding-bottom: 2ex;
 }
 
-section#resultado_rosco h4 {
+article#resultados section#resultado_rosco h4 {
+    text-align: center;
+    margin-top: 3ex;
+    margin-bottom: 2ex;
+    text-decoration: underline;
     padding-bottom: 1ex;
 }
 
-/* Zebra striping */
-section#resultado_rosco tr:nth-of-type(odd) { 
+ /*Zebra striping */
+article#resultados section#resultado_rosco tr:nth-of-type(odd) { 
   background-color: #084B8A;
 }
 
@@ -556,14 +529,20 @@ section#resultado_rosco tr:nth-of-type(odd) {
 only screen and (max-width: 760px),
 (min-device-width: 768px) and (max-device-width: 1024px)  {
 
-    /*
-    Label the data
-    */
+    
+    /*Label the data*/
+    
     section#resultado_rosco td:nth-of-type(1):before { content: "Letra"; }
     section#resultado_rosco td:nth-of-type(2):before { content: "Definición"; }
     section#resultado_rosco td:nth-of-type(3):before { content: "Solución"; }
     section#resultado_rosco td:nth-of-type(4):before { content: "Acertada"; }
     
+}
+
+section#juego a {
+    font-size: 4vw;
+    margin-top: 3ex;
+    width: 12rem;
 }
 
 /* END PANEL DE RESULTADOS */
@@ -673,16 +652,16 @@ only screen and (max-width: 760px),
     /************************************************ */
     
     /**************************** */
-/* PANEL DE ELECCIÓN DE DIFICULTAD */
+    /* PANEL DE ELECCIÓN DE DIFICULTAD */
 
-section#elegir_dificultad {
+    section#elegir_dificultad {
         position: absolute;
         width: 60vw;
         height: auto;
         top: 20%;
         left: 25%;
         font-size: 1vw;
-        
+
         border-radius: 10px 10px 10px 10px;
         -moz-border-radius: 10px 10px 10px 10px;
         -webkit-border-radius: 10px 10px 10px 10px;
@@ -739,100 +718,102 @@ section#elegir_dificultad {
     /************************************************ */
     
     /**************************** */
-    /* PANEL DE RESULTADOS */
+    /* PANEL DE GUARDAR RECORD */
 
-    section#resultados {
+    section#guardar_record_container {
         position: absolute;
-        width: 80vw;
-        top: 20%;
+        width: 30vw;
+        top: 15%;
         left: 10%;
         font-size: 1vw;
-    }
-
-    /* Resultado de la partida */
-    section#resultados section#resultado_container div {
-        font-size: 2vw;
-        opacity: 0.7;
-    }
-    
-    /*Estructura del formulario del resultado*/
-    section#formulario_resultado_container {
-        width: 100%;
-        display: flex;
-        flex-wrap: wrap;
-    }
-    
-    section#formulario_resultado {
-        flex-grow: 1;
-        width: 30%;
+        
+        -webkit-box-shadow: 1px 3px 3px 0px rgba(0,0,0,0.75);
+        -moz-box-shadow: 1px 3px 3px 0px rgba(0,0,0,0.75);
+        box-shadow: 1px 3px 3px 0px rgba(0,0,0,0.75);
     }
 
     /* Resultados (puntuacion final) */
-    section#resultados section#resultados_puntuacion {
+    section#guardar_record_container section#resultados_puntuacion {
         width: 85%;
         font-size: 0.7vw;
         background-color: #585858;
         opacity: 0.6;
         padding: 2ex;
         margin: 0 auto;
-        margin-top: 14ex;
+        margin-top: 4ex;
     }
 
-    section#resultados section article div.resultados_puntuacion {
-        font-size: 1.5vw;
-    }
-
-    section#resultados section article div span {
+    section#resultados_puntuacion article div.resultados_puntuacion, section#resultados_puntuacion article div span {
         font-size: 1.5vw;
     }
 
     /* Guardar record */
-    section#resultados section#guardar_record {
+    section#guardar_record_container section#guardar_record {
         width: 85%;
         margin-top: 2ex;
         padding-bottom: 2ex;
     }
 
-    section#resultados section#guardar_record div {
+    section#guardar_record_container section#guardar_record table {
         font-size: 1.2vw;
         width: 100%;
-        margin-left: 1rem;
+        margin-left: 0.7rem;
     }
 
-    section#resultados section#guardar_record input {
+    section#guardar_record_container section#guardar_record input {
         margin: 5ex;
         margin-left: 5rem;
         width: 65%;
         transform: scale(1.5);
     }
 
-    section#resultados section#guardar_record a {
-        width: 50%;
+    section#guardar_record_container section#guardar_record a {
+        width: 8rem;
         font-size: 1vw;
-        padding-left: 2rem;
-        padding-right: 2rem;
-    }  
+        padding-left: 0px;
+        padding-right: 0px;
+        margin-left: 1rem;
+    }
 
-    /* Resultado del rosco de preguntas */
-    section#resultado_rosco {
-        width: 70%;
+    /* END PANEL DE GUARDAR RECORD */
+    /************************************************ */
+    
+    /**************************** */
+    /* PANEL DE RESULTADOS */
+
+    /* Resultado de la partida */
+
+    section#juego article#resultados {
+        font-size: 2vw;
+        padding-top: 1ex;
+        padding-bottom: 1ex;
+    }
+    
+    article#resultados section#resultado_container {
+        font-size: 2vw;
+        opacity: 0.6;
+    }
+
+    /* Generic Styling, for Desktops/Laptops */
+    article#resultados section#resultado_rosco {      
+        width: 95%;
         font-size: 1vw;
         padding-top: 0.5ex;
         padding-bottom: 2ex;
+        margin: 0 auto;
     }
-    
-    section#resultado_rosco h4 {
-        text-align: center;
+
+    article#resultados section#resultado_rosco h4 {
         margin-top: 1ex;
         margin-bottom: 1ex;
-        text-decoration: underline;
-        font-size: 2vw;
+        font-size: 1.5vw;
         padding-bottom: 0.5ex;
     }
-    
-    section#resultado_rosco table {
-        width: 90%;
-        margin: 0 auto;
+
+    section#juego a {
+        font-size: 1vw;
+        margin-top: 3ex;
+        width: 8rem;
     }
 
     /* END PANEL DE RESULTADOS */

@@ -13,6 +13,8 @@
         "ts/Respuesta.ts",
         "ts/Pregunta.ts",
         "ts/Acertar.ts",
+        "ts/Pregunta_completa.ts",
+        "ts/Resultado_partida.ts",
         "ts/Jugador.ts",
         "ts/Pasapalabra.ts",
         "ts/Main.ts"

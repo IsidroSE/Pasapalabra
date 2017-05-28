@@ -37,5 +37,10 @@ class Jugador {
         div_num_intentos.innerHTML = this._num_intentos + "";
         div_puntuacion.innerHTML = this._puntuacion + "";
     }
+
+    public mostrar_resultados_jugador(): void {
+        div_resultados_intentos.innerHTML = this._num_intentos + "";
+        div_resultados_puntuacion.innerHTML = this._puntuacion + "";
+    }
     
 }
