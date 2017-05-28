@@ -430,7 +430,7 @@ article#info_autor p {
 /* PANEL DE GUARDAR PARTIDA */
 
 section#guardar_record_container { 
-    /*display: none;*/
+    display: none;
     position: absolute;
     width: 100%;
     top: 0%;
@@ -444,6 +444,34 @@ section#guardar_record_container {
     background: -ms-linear-gradient(left, rgba(73,155,234,1) 0%, rgba(32,124,229,1) 100%);
     background: linear-gradient(to right, rgba(73,155,234,1) 0%, rgba(32,124,229,1) 100%);
     filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#499bea', endColorstr='#207ce5', GradientType=1 );
+}
+
+/* Puntuación final */
+section#guardar_record_container section#resultados_puntuacion {
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    font-size: 3vw;
+    background-color: #585858;
+    opacity: 0.8;
+    padding-top: 2ex;
+    padding-bottom: 2ex;
+}
+
+section#resultados_puntuacion article {
+    flex-grow: 1;
+    width: 33.33%;
+    min-width: 33.33%;   
+    color: white;
+    text-align: center;
+}
+
+section#resultados_puntuacion article div.resultados_puntuacion, section#resultados_puntuacion article div span {
+    font-size: 7vw;
+}
+
+section#resultados_puntuacion article div div.resultados_puntuacion {
+    display: inline;
 }
 
 /* Guardar record */
@@ -732,18 +760,19 @@ section#juego a {
         box-shadow: 1px 3px 3px 0px rgba(0,0,0,0.75);
     }
 
-    /* Resultados (puntuacion final) */
+    /* Puntuación final */
     section#guardar_record_container section#resultados_puntuacion {
         width: 85%;
         font-size: 0.7vw;
         background-color: #585858;
-        opacity: 0.6;
+        opacity: 0.7;
         padding: 2ex;
         margin: 0 auto;
         margin-top: 4ex;
     }
 
-    section#resultados_puntuacion article div.resultados_puntuacion, section#resultados_puntuacion article div span {
+    section#resultados_puntuacion article div.resultados_puntuacion, 
+    section#resultados_puntuacion article div span {
         font-size: 1.5vw;
     }
 
