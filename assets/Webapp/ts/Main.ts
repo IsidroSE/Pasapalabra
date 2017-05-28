@@ -150,6 +150,36 @@ $(document).ready(function() {
         }
     });
 
+    $( "a#boton_no_guardar_record" ).click(function(event) {
+        event.preventDefault();
+
+        if (pasapalabra.gameState == GameState.GAME_ENDED) {
+            section_guardar_record.hide();
+        }
+        
+    });
+
+    $( "a#boton_nueva_partida" ).click(function(event) {
+        event.preventDefault();
+
+        if (pasapalabra.gameState == GameState.GAME_ENDED) {
+
+            sendAjaxRequest("GET", "acabar_partida", JSON.stringify(""), function(response) {
+                let data: any = JSON.parse(response);
+
+                if (data[RESPONSE._OK]._ok) {
+                    pasapalabra = new Pasapalabra();
+                }
+                else {
+                    location.reload();
+                }
+
+            });
+
+        }
+
+    });
+
 }); // END $(document).ready();
 
 //Actualiza los marcadores de puntuación y número de intentos
@@ -277,6 +307,11 @@ function mostrar_resultados(): void {
         section_guardar_record.show();
         article_formulario_juego.hide();
         article_resultados.show();
+
+        let rosco: any = data[RESPONSE._ROSCO];
+        let resultado: Resultado_partida = new Resultado_partida();
+        pasapalabra.resultado_partida.object_to_pregunta_completa(rosco);
+        pasapalabra.resultado_partida.mostrar_tabla_resultados();
 
     });
 

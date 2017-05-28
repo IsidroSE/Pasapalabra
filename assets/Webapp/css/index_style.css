@@ -261,6 +261,14 @@ section#records table, section#resultado_rosco table {
   border-collapse: collapse; 
 }
 
+section#resultado_rosco table tr.verde {
+    color: green;
+}
+
+section#resultado_rosco table tr.rojo {
+    color: red;
+}
+
 /* Zebra striping */
 section#records tr:nth-of-type(odd) { 
   background: #eee;
@@ -429,7 +437,7 @@ article#info_autor p {
 /**************************** */
 /* PANEL DE GUARDAR PARTIDA */
 
-section#guardar_record_container { 
+section#guardar_record_container {
     display: none;
     position: absolute;
     width: 100%;
@@ -563,7 +571,7 @@ only screen and (max-width: 760px),
     section#resultado_rosco td:nth-of-type(1):before { content: "Letra"; }
     section#resultado_rosco td:nth-of-type(2):before { content: "Definición"; }
     section#resultado_rosco td:nth-of-type(3):before { content: "Solución"; }
-    section#resultado_rosco td:nth-of-type(4):before { content: "Acertada"; }
+    section#resultado_rosco td:nth-of-type(4):before { content: "Respuesta del jugador"; }
     
 }
 
@@ -751,7 +759,7 @@ section#juego a {
     section#guardar_record_container {
         position: absolute;
         width: 30vw;
-        top: 15%;
+        top: 25%;
         left: 10%;
         font-size: 1vw;
         

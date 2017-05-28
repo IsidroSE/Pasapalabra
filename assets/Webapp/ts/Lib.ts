@@ -59,6 +59,7 @@ const RESPONSE: any = {
     _JUGADOR: "_jugador",
     _NUM_INTENTOS: "_num_intentos",
     _PUNTUACION: "_puntuacion",
+    _ROSCO: "_rosco",
     _PREGUNTA: "_pregunta",
     _ACERTAR: "_acertar",
     _GANAR: "_ganar"
@@ -67,7 +68,7 @@ const RESPONSE: any = {
 //DOM de la ventana de guardar record
 let section_guardar_record: JQuery = <JQuery>$("section#guardar_record_container");
 let div_resultado: HTMLElement = document.getElementById("div_resultado");
-let section_resultado_rosco: JQuery = <JQuery>$("section#resultado_rosco"); // <-- Aquí va la tabla
+let section_resultado_rosco: JQuery = <JQuery>$("section#resultado_rosco table tbody"); // <-- Aquí va la tabla
 let btn_nueva_partida: HTMLElement = document.getElementById("boton_nueva_partida");
 
 //DOM de la sección de resultados
@@ -80,7 +81,8 @@ let btn_guardar_record: HTMLElement = document.getElementById("boton_guardar_rec
 let btn_no_guardar_record: HTMLElement = document.getElementById("boton_no_guardar_record");
 
 //CSS de la ventana de resultados
-//-------------------------------
+const VERDE: string = "verde";
+const ROJO: string = "rojo";
 
 //Mensajes que se mostrarán al finalizar el juego
 const DERROTA: string = "¡No te quedan intentos para seguir jugando!";

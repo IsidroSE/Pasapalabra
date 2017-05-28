@@ -491,6 +491,7 @@ class Welcome extends CI_Controller {
 
                     //Guardaremos en el rosco si esta pregunta ha sido acertada o no y la puntuación del jugador
                     $preguntas_rosco[$index]->set_acertada($acertar);
+                    $preguntas_rosco[$index]->set_respuesta_jugador($respuesta->get_respuesta());
                     $jugador->set_puntuacion($puntuacion);
 
                     //Cambiaremos el estado del juego y actualizaremos el jugador en la sesión
@@ -655,6 +656,49 @@ class Welcome extends CI_Controller {
         }
         
         return $datos_preguntas;
+        
+    }
+    
+    public function acabar_partida() {
+        
+        //Comprobamos si el jugador existe
+        if (isset($this->session->JUGADOR)) {
+
+            $jugador = $this->session->JUGADOR;
+
+            if ($jugador->get_gameState() == Config_Pasapalabra::GAMESTATE["GAME_ENDED"]) {
+                
+                //Guardamos el jugador en una variable de sesión
+                $jugador = null;
+                $this->session->JUGADOR = $jugador;
+
+                $this->session->unset_userdata($this->session->JUGADOR);
+
+                $this->session->sess_destroy();
+            
+                $error = false;
+            }
+            else {
+                $error = true;
+            }
+        }
+        else {
+            $error = true;
+        }
+        
+        
+        //Crearemos un objeto de la clase OK con el resultado de la validación
+        $ok = new OK();
+        $ok->set_ok(!$error);
+
+        /* Creamos un vector donde enviaremos el número de intentos, puntuación y si se ha acertado 
+         * o no la pregunta para que se actualice en le cliente */
+        $response = array(
+            Config_Pasapalabra::RESPONSE["OK"] => $ok
+        );
+
+        //Enviamos la respuesta al cliente
+        echo json_encode($response);
         
     }
 

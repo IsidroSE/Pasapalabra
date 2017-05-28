@@ -9,6 +9,7 @@ class Pregunta extends CI_Model implements JsonSerializable {
     private $_definicion;
     private $_solucion;
     private $_acertada;
+    private $_respuesta_jugador;
     
     function __construct() {
         parent::__construct();
@@ -50,7 +51,15 @@ class Pregunta extends CI_Model implements JsonSerializable {
     function get_acertada() {
         return $this->_acertada;
     }
+    
+    function get_respuesta_jugador() {
+        return $this->_respuesta_jugador;
+    }
 
+    function set_respuesta_jugador($_respuesta_jugador) {
+        $this->_respuesta_jugador = $_respuesta_jugador;
+    }
+    
     function set_acertada($_acertada) {
         $this->_acertada = $_acertada;
     }
@@ -67,7 +76,8 @@ class Pregunta extends CI_Model implements JsonSerializable {
             '_letra' => $this->_letra,
             '_definicion' => $this->_definicion,
             '_solucion' => $this->_solucion,
-            '_acertada' => $this->_acertada
+            '_acertada' => $this->_acertada,
+            '_respuesta_jugador' => $this->_respuesta_jugador
         ];
     }
 

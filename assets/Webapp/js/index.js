@@ -50,6 +50,7 @@ var RESPONSE = {
     _JUGADOR: "_jugador",
     _NUM_INTENTOS: "_num_intentos",
     _PUNTUACION: "_puntuacion",
+    _ROSCO: "_rosco",
     _PREGUNTA: "_pregunta",
     _ACERTAR: "_acertar",
     _GANAR: "_ganar"
@@ -57,7 +58,7 @@ var RESPONSE = {
 //DOM de la ventana de guardar record
 var section_guardar_record = $("section#guardar_record_container");
 var div_resultado = document.getElementById("div_resultado");
-var section_resultado_rosco = $("section#resultado_rosco"); // <-- Aquí va la tabla
+var section_resultado_rosco = $("section#resultado_rosco table tbody"); // <-- Aquí va la tabla
 var btn_nueva_partida = document.getElementById("boton_nueva_partida");
 //DOM de la sección de resultados
 var article_resultados = $("article#resultados");
@@ -68,7 +69,8 @@ var input_nick_introducido = document.getElementById("input_nick_introducido");
 var btn_guardar_record = document.getElementById("boton_guardar_record");
 var btn_no_guardar_record = document.getElementById("boton_no_guardar_record");
 //CSS de la ventana de resultados
-//-------------------------------
+var VERDE = "verde";
+var ROJO = "rojo";
 //Mensajes que se mostrarán al finalizar el juego
 var DERROTA = "¡No te quedan intentos para seguir jugando!";
 var VICTORIA = "¡Has ganado!";
@@ -182,11 +184,12 @@ var Acertar = (function () {
     return Acertar;
 }());
 var Pregunta_completa = (function () {
-    function Pregunta_completa(letra, definicion, solucion, acertada) {
+    function Pregunta_completa(letra, definicion, solucion, acertada, respuesta_jugador) {
         this._letra = letra;
         this._definicion = definicion;
         this._solucion = solucion;
         this._acertada = acertada;
+        this._respuesta_jugador = respuesta_jugador;
     }
     Object.defineProperty(Pregunta_completa.prototype, "letra", {
         get: function () {
@@ -228,6 +231,19 @@ var Pregunta_completa = (function () {
         enumerable: true,
         configurable: true
     });
+    Object.defineProperty(Pregunta_completa.prototype, "respuesta_jugador", {
+        get: function () {
+            return this._respuesta_jugador;
+        },
+        set: function (respuesta_jugador) {
+            this._respuesta_jugador = respuesta_jugador;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Pregunta_completa.createFromObject = function (object) {
+        return new Pregunta_completa(object["_letra"], object["_definicion"], object["_solucion"], object["_acertada"], object["_respuesta_jugador"]);
+    };
     return Pregunta_completa;
 }());
 var Resultado_partida = (function () {
@@ -250,6 +266,32 @@ var Resultado_partida = (function () {
     });
     Resultado_partida.prototype.agregar_pregunta = function (pregunta) {
         this._solucion_preguntas.push(pregunta);
+    };
+    Resultado_partida.prototype.object_to_pregunta_completa = function (rosco) {
+        var pregunta;
+        for (var _i = 0, rosco_1 = rosco; _i < rosco_1.length; _i++) {
+            var solucion = rosco_1[_i];
+            pregunta = Pregunta_completa.createFromObject(solucion);
+            this.agregar_pregunta(pregunta);
+        }
+    };
+    Resultado_partida.prototype.mostrar_tabla_resultados = function () {
+        var DOM_tabla = "";
+        var color_letra;
+        for (var _i = 0, _a = this._solucion_preguntas; _i < _a.length; _i++) {
+            var pregunta = _a[_i];
+            if (pregunta.acertada)
+                color_letra = VERDE;
+            else
+                color_letra = ROJO;
+            DOM_tabla += '<tr class="' + color_letra + '" >';
+            DOM_tabla += "<td>" + pregunta.letra + "</td>";
+            DOM_tabla += "<td>" + pregunta.definicion + "</td>";
+            DOM_tabla += "<td>" + pregunta.solucion + "</td>";
+            DOM_tabla += "<td>" + pregunta.respuesta_jugador + "</td>";
+            DOM_tabla += "</tr>";
+        }
+        section_resultado_rosco.html(DOM_tabla);
     };
     return Resultado_partida;
 }());
@@ -308,6 +350,13 @@ var Pasapalabra = (function () {
         this._jugador.mostrar_datos_jugador();
         btn_saltar.className = BOTON_DESACTIVADO;
         btn_comprobar.className = BOTON_DESACTIVADO;
+        this._resultado_partida = new Resultado_partida();
+        section_guardar_record.hide();
+        article_formulario_juego.show();
+        article_resultados.hide();
+        contenedor_seleccion_dificultad.show();
+        $("article#rosco div").removeClass();
+        $("article#rosco div").addClass(FONDO_AZUL);
     };
     Object.defineProperty(Pasapalabra.prototype, "gameState", {
         get: function () {
@@ -325,6 +374,16 @@ var Pasapalabra = (function () {
         },
         set: function (jugador) {
             this._jugador = jugador;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(Pasapalabra.prototype, "resultado_partida", {
+        get: function () {
+            return this._resultado_partida;
+        },
+        set: function (resultado_partida) {
+            this._resultado_partida = resultado_partida;
         },
         enumerable: true,
         configurable: true
@@ -440,6 +499,26 @@ $(document).ready(function () {
             });
         }
     });
+    $("a#boton_no_guardar_record").click(function (event) {
+        event.preventDefault();
+        if (pasapalabra.gameState == GameState.GAME_ENDED) {
+            section_guardar_record.hide();
+        }
+    });
+    $("a#boton_nueva_partida").click(function (event) {
+        event.preventDefault();
+        if (pasapalabra.gameState == GameState.GAME_ENDED) {
+            sendAjaxRequest("GET", "acabar_partida", JSON.stringify(""), function (response) {
+                var data = JSON.parse(response);
+                if (data[RESPONSE._OK]._ok) {
+                    pasapalabra = new Pasapalabra();
+                }
+                else {
+                    location.reload();
+                }
+            });
+        }
+    });
 }); // END $(document).ready();
 //Actualiza los marcadores de puntuación y número de intentos
 function actualizar_marcadores(num_intentos, puntuacion) {
@@ -539,6 +618,10 @@ function mostrar_resultados() {
         section_guardar_record.show();
         article_formulario_juego.hide();
         article_resultados.show();
+        var rosco = data[RESPONSE._ROSCO];
+        var resultado = new Resultado_partida();
+        pasapalabra.resultado_partida.object_to_pregunta_completa(rosco);
+        pasapalabra.resultado_partida.mostrar_tabla_resultados();
     });
 }
 //Actualiza los marcadores de puntuación y número de intentos

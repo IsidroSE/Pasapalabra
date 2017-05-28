@@ -111,7 +111,7 @@
                                 <th>Letra</th>
                                 <th>Definición</th>
                                 <th>Solución</th>
-                                <th>Acertada</th>
+                                <th>Respuesta del jugador</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -147,10 +147,11 @@
                             </tr>
                         </tbody>
                     </table>
+                    
+                    <a href="#" class="myButton_enabled" id="boton_nueva_partida">Nueva partida</a>
 
                 </section>
                 
-                <a href="#" class="myButton_enabled" id="boton_nueva_partida">Nueva partida</a>
                 
             </article>
             
