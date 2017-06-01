@@ -36,14 +36,16 @@ class Resultado_partida {
         for (let pregunta of this._solucion_preguntas) {
 
             if (pregunta.acertada) color_letra = VERDE;
-            else color_letra = ROJO;
-
+            else if (pregunta.acertada == false) color_letra = ROJO;
+            else color_letra = "";
+            
             DOM_tabla += '<tr class="' + color_letra + '" >';
 
             DOM_tabla += "<td>" + pregunta.letra + "</td>";
             DOM_tabla += "<td>" + pregunta.definicion + "</td>";
             DOM_tabla += "<td>" + pregunta.solucion + "</td>";
-            DOM_tabla += "<td>" + pregunta.respuesta_jugador + "</td>";
+            let respuesta_jugador: string = pregunta.respuesta_jugador != null ? pregunta.respuesta_jugador : "";
+            DOM_tabla += "<td>" + respuesta_jugador + "</td>";
 
             DOM_tabla += "</tr>";
 

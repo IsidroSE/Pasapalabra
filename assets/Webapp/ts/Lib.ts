@@ -62,7 +62,9 @@ const RESPONSE: any = {
     _ROSCO: "_rosco",
     _PREGUNTA: "_pregunta",
     _ACERTAR: "_acertar",
-    _GANAR: "_ganar"
+    _GANAR: "_ganar",
+    _PLAYING_TIME: "_playing_time",
+    _TIEMPO_PARTIDA: "_tiempo_partida"
 };
 
 //DOM de la ventana de guardar record
@@ -85,7 +87,13 @@ const VERDE: string = "verde";
 const ROJO: string = "rojo";
 
 //Mensajes que se mostrarán al finalizar el juego
-const DERROTA: string = "¡No te quedan intentos para seguir jugando!";
-const VICTORIA: string = "¡Has ganado!";
+const MENSAJE_FIN_JUEGO: any = {
+    VICTORIA: "¡Has ganado!",
+    DERROTA: "¡No te quedan intentos para seguir jugando!",
+    NO_TIEMPO: "¡Te se ha acabado el tiempo!"
+};
 
+//TIEMPO INICIAL
 //const TIEMPO_INICIAL: number = 300000;
+const MINUTOS: number = 1;
+const SEGUNDOS: number = 0;

@@ -37,6 +37,8 @@ class Welcome extends CI_Controller {
         $this->load->model("Modelos_Pasapalabra/Pregunta");
         $this->load->model("Modelos_Pasapalabra/Respuesta");
         $this->load->model("Modelos_Pasapalabra/Acertar");
+        $this->load->model("Modelos_Pasapalabra/Playing_Time");
+        $this->load->model("Modelos_Pasapalabra/Tiempo_Partida");
         $this->load->model("Modelos_Pasapalabra/OK");
         $this->load->model("Modelos_Pasapalabra/Rosco");
         $this->load->model("Modelos_Pasapalabra/Jugador");
@@ -238,8 +240,12 @@ class Welcome extends CI_Controller {
 //        $post = $this->Questions_model->getQuestion("A", "Normal");
 //        echo $post->get_definicion();
 //        echo Config_Pasapalabra::GAMESTATE["GAME_STARTING"];
-        echo Config_Pasapalabra::NUM_INTENTOS_INICIAL;
-        echo Config_Pasapalabra::PUNTUACION_INCIAL;
+//        echo Config_Pasapalabra::NUM_INTENTOS_INICIAL;
+//        echo Config_Pasapalabra::PUNTUACION_INCIAL;
+
+        $tiempo_juego = $this->obtener_tiempo_juego(time(), (time() + (5 * 60)));
+        echo $tiempo_juego->get_minutos() . "<br>";
+        echo $tiempo_juego->get_segundos() . "<br>";
     }
 
     /* Mediante una petición AJAX desde el cliente, el cual envia un JSON con la 
@@ -277,19 +283,27 @@ class Welcome extends CI_Controller {
             $jugador->set_gameState(Config_Pasapalabra::GAMESTATE["PROCESSING"]);
             $jugador->set_num_intentos(Config_Pasapalabra::NUM_INTENTOS_INICIAL);
             $jugador->set_puntuacion(Config_Pasapalabra::PUNTUACION_INCIAL);
+            
+            //Guardamos el tiempo en segundos cuando empieza el juego
+            $tiempo_inicio = new $this->Playing_Time();
+            $dateTime = new DateTime();
+            $tiempo_inicio->set_tiempo_inicio($dateTime);
+            $tiempo_inicio->set_playing_time(true);
+            $jugador->set_playing_time($tiempo_inicio);
 
             //Guardamos el jugador en una variable de sesión
             $this->session->JUGADOR = $jugador;
 
             //Los datos son correctos
             $validacion_correcta = true;
+            
         } else {
             //Los datos NO son correctos
             $validacion_correcta = false;
         }
 
         //Crearemos un objeto de la clase OK con el resultado de la validación
-        $ok = new OK();
+        $ok = new $this->OK();
         $ok->set_ok($validacion_correcta);
 
         //Creamos un vector donde enviaremos los parámetros necesarios para iniciar el juego
@@ -318,61 +332,79 @@ class Welcome extends CI_Controller {
 
             //Comprobamos que el jugador está en el estado correcto
             if ($jugador->get_gameState() == Config_Pasapalabra::GAMESTATE["PROCESSING"]) {
+                
+                //Obtenemos el tiempo de inicio, comprobamos si aún queda tiempo y guardaremos el resultado
+                $playing_time = $jugador->get_playing_time();
+                $tiempo_inicio = $playing_time->get_tiempo_inicio();
+                $is_playing_time = $this->is_playing_time($tiempo_inicio);
+                $playing_time->set_playing_time($is_playing_time);
+                $playing_time->set_tiempo_fin(time());
+                
+                //Guardamos el resultado para futuras consultas
+                $jugador->set_playing_time($playing_time);
 
-                //Obtenemos la letra de la palabra que queramos a obtener
-                $rosco_jugador = $jugador->get_rosco();
-                $letra_actual_rosco = $this->buscar_letra_siguiente($rosco_jugador);
+                //Comprobaremos si aún queda tiempo para efectuar la acción
+                if ($is_playing_time) {
 
-                //Si el rosco no esta lleno, extraeremos una nueva pregunta de la base de datos
-                if ($letra_actual_rosco != "") {
+                    //Obtenemos la letra de la palabra que queramos a obtener
+                    $rosco_jugador = $jugador->get_rosco();
+                    $letra_actual_rosco = $this->buscar_letra_siguiente($rosco_jugador);
 
-                    $dificultad_rosco = $rosco_jugador->getDificultad_rosco();
+                    //Si el rosco no esta lleno, extraeremos una nueva pregunta de la base de datos
+                    if ($letra_actual_rosco != "") {
 
-                    /* Obtenemos una pregunta aleatoria de la BD que tenga esta letra y esta dificultad */
-                    $pregunta = $this->Questions_model->getQuestion($letra_actual_rosco, $dificultad_rosco->get_dificultad_seleccionada());
+                        $dificultad_rosco = $rosco_jugador->getDificultad_rosco();
 
-                    //Agregamos la pregunta al rosco, cambiamos su gamestate y guardamos los cambios en la sesión
-                    $rosco_jugador->addPregunta($pregunta);
-                    $jugador->set_rosco($rosco_jugador);
-                    $jugador->set_gameState(Config_Pasapalabra::GAMESTATE["ANSWERING"]);
-                    $this->session->JUGADOR = $jugador;
-                }
-                //Si el rosco ya está lleno, buscaremos la siguiente pregunta sin contestar en el rosco
-                else {
+                        /* Obtenemos una pregunta aleatoria de la BD que tenga esta letra y esta dificultad */
+                        $pregunta = $this->Questions_model->getQuestion($letra_actual_rosco, $dificultad_rosco->get_dificultad_seleccionada());
 
-                    $rosco_jugador = $this->buscar_pregunta_siguiente($rosco_jugador);
-
-                    //Si ha encontrado una pregunta sin contestar, se la pasaremos al jugador
-                    if ($rosco_jugador->getIndex() != null) {
-
-                        //Obtenemos el index de la siguiente pregunta sin contestar en el rosco
-                        $index = $rosco_jugador->getIndex();
-
-                        //Obtenemos la pregunta con el index indicado
-                        $pregunta = $rosco_jugador->getPregunta($index);
-
+                        //Agregamos la pregunta al rosco, cambiamos su gamestate y guardamos los cambios en la sesión
+                        $rosco_jugador->addPregunta($pregunta);
                         $jugador->set_rosco($rosco_jugador);
                         $jugador->set_gameState(Config_Pasapalabra::GAMESTATE["ANSWERING"]);
                         $this->session->JUGADOR = $jugador;
                     }
-                    /* Si no se ha encontrado ninguna, la partida habrá terminado y habrá que avisar al jugador
-                     * de que la partida ha terminado */ else {
+                    //Si el rosco ya está lleno, buscaremos la siguiente pregunta sin contestar en el rosco
+                    else {
 
-                        //Ha ganado
-                        if ($jugador->get_num_intentos() > 0) {
-                            $ganar->set_ganar(true);
+                        $rosco_jugador = $this->buscar_pregunta_siguiente($rosco_jugador);
+
+                        //Si ha encontrado una pregunta sin contestar, se la pasaremos al jugador
+                        if ($rosco_jugador->getIndex() != null) {
+
+                            //Obtenemos el index de la siguiente pregunta sin contestar en el rosco
+                            $index = $rosco_jugador->getIndex();
+
+                            //Obtenemos la pregunta con el index indicado
+                            $pregunta = $rosco_jugador->getPregunta($index);
+
+                            $jugador->set_rosco($rosco_jugador);
+                            $jugador->set_gameState(Config_Pasapalabra::GAMESTATE["ANSWERING"]);
+                            $this->session->JUGADOR = $jugador;
                         }
-                        //Ha perdido
+                        /* Si no se ha encontrado ninguna, la partida habrá terminado y habrá que avisar al jugador
+                         * de que la partida ha terminado */ 
                         else {
-                            $ganar->set_ganar(false);
-                        }
+                            //Ha ganado
+                            if ($jugador->get_num_intentos() > 0) {
+                                $ganar->set_ganar(true);
+                            }
+                            //Ha perdido
+                            else {
+                                $ganar->set_ganar(false);
+                            }
 
-                        $jugador->set_gameState(Config_Pasapalabra::GAMESTATE["GAME_ENDED"]);
+                            $jugador->set_gameState(Config_Pasapalabra::GAMESTATE["GAME_ENDED"]);
+                        }
                     }
+                }
+                else {
+                    $jugador->set_gameState(Config_Pasapalabra::GAMESTATE["GAME_ENDED"]);
                 }
 
                 //Todo es correcto
                 $error = false;
+                
             } else {
                 $error = true;
             }
@@ -387,6 +419,7 @@ class Welcome extends CI_Controller {
         //Creamos un vector donde enviaremos un objeto ok y una pregunta
         $response = array(
             Config_Pasapalabra::RESPONSE["OK"] => $ok,
+            Config_Pasapalabra::RESPONSE["PLAYING_TIME"] => $playing_time,
             Config_Pasapalabra::RESPONSE["PREGUNTA"] => $pregunta,
             Config_Pasapalabra::RESPONSE["GANAR"] => $ganar
         );
@@ -522,7 +555,7 @@ class Welcome extends CI_Controller {
         }
 
         //Crearemos un objeto de la clase OK con el resultado de la validación
-        $ok = new OK();
+        $ok = new $this->OK();
         $ok->set_ok(!$error);
 
         /* Creamos un vector donde enviaremos el número de intentos, puntuación y si se ha acertado 
@@ -594,7 +627,7 @@ class Welcome extends CI_Controller {
         }
 
         //Crearemos un objeto de la clase OK con el resultado de la validación
-        $ok = new OK();
+        $ok = new $this->OK();
         $ok->set_ok(!$error);
 
         $response = array(
@@ -615,22 +648,29 @@ class Welcome extends CI_Controller {
 
             if ($jugador->get_gameState() == Config_Pasapalabra::GAMESTATE["GAME_ENDED"]) {
                 
+                //Obtenemos el tiempo desde que ha empezado el juego
+                $playing_time = $jugador->get_playing_time();
+                $tiempo_inicio = $playing_time->get_tiempo_inicio();
+                $tiempo_fin = $playing_time->get_tiempo_fin();
+                $tiempo_juego = $this->obtener_tiempo_juego($tiempo_inicio, new DateTime());
+                
+                //Lo guardamos en la sesion para no tener que volver a calcularlo
+                $jugador->set_tiempo_partida($tiempo_juego);
+                $this->session->JUGADOR = $jugador;
+                
                 $rosco_jugador = $jugador->get_rosco();
                 $datos_preguntas = $this->get_all_questions($rosco_jugador->getPreguntas());
-                
+
                 $error = false;
-                
-            }
-            else {
+            } else {
                 $error = true;
             }
-        }
-        else {
+        } else {
             $error = true;
         }
 
         //Crearemos un objeto de la clase OK con el resultado de la validación
-        $ok = new OK();
+        $ok = new $this->OK();
         $ok->set_ok(!$error);
 
         /* Creamos un vector donde enviaremos el número de intentos, puntuación y si se ha acertado 
@@ -638,36 +678,35 @@ class Welcome extends CI_Controller {
         $response = array(
             Config_Pasapalabra::RESPONSE["OK"] => $ok,
             Config_Pasapalabra::RESPONSE["JUGADOR"] => $jugador,
+            Config_Pasapalabra::RESPONSE["TIEMPO_PARTIDA"] => $tiempo_juego,
             Config_Pasapalabra::RESPONSE["ROSCO"] => $datos_preguntas
         );
 
         //Enviamos la respuesta al cliente
         echo json_encode($response);
     }
-    
+
     private function get_all_questions($preguntas) {
-        
+
         $datos_preguntas = array();
-        
+
         foreach ($preguntas as $pregunta) {
-            
+
             $datos_preguntas[] = $pregunta->jsonSerialize_all();
-            
         }
-        
+
         return $datos_preguntas;
-        
     }
-    
+
     public function acabar_partida() {
-        
+
         //Comprobamos si el jugador existe
         if (isset($this->session->JUGADOR)) {
 
             $jugador = $this->session->JUGADOR;
 
             if ($jugador->get_gameState() == Config_Pasapalabra::GAMESTATE["GAME_ENDED"]) {
-                
+
                 //Guardamos el jugador en una variable de sesión
                 $jugador = null;
                 $this->session->JUGADOR = $jugador;
@@ -675,20 +714,95 @@ class Welcome extends CI_Controller {
                 $this->session->unset_userdata($this->session->JUGADOR);
 
                 $this->session->sess_destroy();
-            
+
                 $error = false;
-            }
-            else {
+            } else {
                 $error = true;
             }
-        }
-        else {
+        } else {
             $error = true;
         }
-        
-        
+
+
         //Crearemos un objeto de la clase OK con el resultado de la validación
-        $ok = new OK();
+        $ok = new $this->OK();
+        $ok->set_ok(!$error);
+
+        /* Creamos un vector donde enviaremos el número de intentos, puntuación y si se ha acertado 
+         * o no la pregunta para que se actualice en le cliente */
+        $response = array(
+            Config_Pasapalabra::RESPONSE["OK"] => $ok
+        );
+
+        //Enviamos la respuesta al cliente
+        echo json_encode($response);
+    }
+
+    private function is_playing_time($initial_time) {
+
+        $tiempo_inicio = $initial_time;
+        
+        $d = clone $tiempo_inicio;
+        $d->modify('+1 minutes');
+        if (new DateTime() > $d) {
+//        if (time() > ($tiempo_inicio + (5 * 60))) {
+            $playing_time = false;
+        } else {
+            $playing_time = true;
+        }
+
+        return $playing_time;
+    }
+    
+    private function obtener_tiempo_juego($tiempo_inicial, $tiempo_fin) {
+        
+//        $tiempo_tardado = $tiempo_fin - $tiempo_inicial;
+//        
+//        $minutos = floor($tiempo_tardado / 60);
+//        $segundos = round($tiempo_tardado % 60);
+        
+//        $minutos1 = floor($tiempo_inicial / 60);
+//        $segundos1 = $tiempo_inicial % 60;
+//        
+//        $minutos2 = floor($tiempo_fin / 60);
+//        $segundos2 = $tiempo_fin % 60;
+//        
+//        $minutos = $minutos2 - $minutos1;
+//        $segundos = $segundos2 - $segundos1;
+        
+        $interval = $tiempo_inicial->diff($tiempo_fin);
+        $minutos = $interval->format('%i');
+        $segundos = $interval->format('%s');
+                
+        $tiempo_juego = new $this->Tiempo_Partida();
+        $tiempo_juego->set_minutos($minutos);
+        $tiempo_juego->set_segundos($segundos);
+        
+        $d = clone $tiempo_inicial;
+        $d->modify('+1 minutes');
+        if ($tiempo_juego > $d) {$tiempo_juego = $d;}
+        
+        return $tiempo_juego;
+        
+    }
+    
+    public function finish_game() {
+        
+        if (isset($this->session->JUGADOR)) {
+            
+            $jugador = $this->session->JUGADOR;
+            
+            //Cambiaremos el estado del juego y actualizaremos el jugador en la sesión
+            $jugador->set_gameState(Config_Pasapalabra::GAMESTATE["GAME_ENDED"]);
+            $this->session->JUGADOR = $jugador;
+            
+            $error = false;
+        } else {
+            $error = true;
+        }
+
+        //Crearemos un objeto de la clase OK con el resultado de la validación
+        $ok = new $this->OK();
         $ok->set_ok(!$error);
 
         /* Creamos un vector donde enviaremos el número de intentos, puntuación y si se ha acertado 

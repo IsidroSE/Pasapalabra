@@ -28,6 +28,7 @@ $(document).ready(function() {
                         let obj: Object = data[RESPONSE._JUGADOR];
                         actualizar_marcadores(obj[RESPONSE._NUM_INTENTOS], obj[RESPONSE._PUNTUACION]);
                         obtener_pregunta_rosco();
+                        pasapalabra.jugador.timer.start_timer();
                     }
                     //Si ha habido algún error, volveremos a cargar la página
                     else {
@@ -62,7 +63,7 @@ $(document).ready(function() {
                     
                     //Si la operación se ha realizado con éxito, continuaremos con el juego
                     if (data[RESPONSE._OK]._ok) {
-
+                        
                         let obj: Object = data[RESPONSE._JUGADOR];
                         actualizar_marcadores(obj[RESPONSE._NUM_INTENTOS], obj[RESPONSE._PUNTUACION]);
                         //Convertimos el objeto recibido en un objeto Acertar
@@ -84,17 +85,15 @@ $(document).ready(function() {
 
                         //Comprobaremos si el jugador se ha quedado sin intentos
                         if (data[RESPONSE._GANAR]._ganar == null) {
-
                             //Y obtenemos la siguiente pregunta del rosco
                             obtener_pregunta_rosco();
 
                         }
                         else {
 
-                            div_resultado.className = FONDO_ROJO;
-                            div_resultado.innerHTML = DERROTA;
-                            pasapalabra.gameState = GameState.GAME_ENDED;
-                            mostrar_resultados();
+                            let fondo_titulo: string = FONDO_ROJO;
+                            let mensaje_fin_juego: string = MENSAJE_FIN_JUEGO.DERROTA;
+                            finalizar_juego(fondo_titulo, mensaje_fin_juego);
 
                         }
 
@@ -248,9 +247,9 @@ function obtener_pregunta_rosco(): void {
 
             //Si no se ha producido ningún error...
             if (data[RESPONSE._OK]._ok) {
-
+                // console.log(response);
                 //Y no se ha acabado el juego
-                if (data[RESPONSE._GANAR]._ganar == null) {
+                if (data[RESPONSE._GANAR]._ganar == null && data[RESPONSE._PLAYING_TIME]._playing_time) {
                     
                     //Creamos un objeto Pregunta a partir de la pregunta recibida por el servidor
                     let pregunta: Pregunta = Pregunta.createFromObject(data[RESPONSE._PREGUNTA]);
@@ -269,17 +268,19 @@ function obtener_pregunta_rosco(): void {
                 }
                 else {
 
+                    let fondo_titulo: string;
+                    let mensaje_fin_juego: string;
+
                     if(data[RESPONSE._GANAR]._ganar) {
-                        div_resultado.className = FONDO_VERDE;
-                        div_resultado.innerHTML = VICTORIA;
+                        fondo_titulo = FONDO_VERDE;
+                        mensaje_fin_juego = MENSAJE_FIN_JUEGO.VICTORIA;
                     }
                     else {
-                        div_resultado.className = FONDO_ROJO;
-                        div_resultado.innerHTML = DERROTA;
+                        fondo_titulo = FONDO_ROJO;
+                        mensaje_fin_juego = MENSAJE_FIN_JUEGO.DERROTA;
                     }
                     
-                    pasapalabra.gameState = GameState.GAME_ENDED;
-                    mostrar_resultados();
+                    finalizar_juego(fondo_titulo, mensaje_fin_juego);
                     
                 }
 
@@ -294,14 +295,28 @@ function obtener_pregunta_rosco(): void {
 
 }
 
+function finalizar_juego(fondo_titulo: string, mensaje_fin_juego: string) {
+
+    div_resultado.className = fondo_titulo;
+    div_resultado.innerHTML = mensaje_fin_juego;
+    pasapalabra.gameState = GameState.GAME_ENDED;
+    pasapalabra.jugador.timer.encendido = false;
+    mostrar_resultados();
+
+}
+
 function mostrar_resultados(): void {
 
     sendAjaxRequest("GET", "obtener_resultados", JSON.stringify(""), function(response) {
 
         let data: any = JSON.parse(response);
-        // console.log(data);
+        console.log(data);
 
         let _jugador: Object = data[RESPONSE._JUGADOR];
+        let _minutos: string = data[RESPONSE._TIEMPO_PARTIDA]._minutos;
+        let _segundos: string = data[RESPONSE._TIEMPO_PARTIDA]._segundos;
+        pasapalabra.jugador.timer.actualizar_resultados_contador( +_minutos, +_segundos );
+
         actualizar_resultados(_jugador[RESPONSE._NUM_INTENTOS], _jugador[RESPONSE._PUNTUACION]);
 
         section_guardar_record.show();
@@ -323,3 +338,5 @@ function actualizar_resultados(num_intentos: number, puntuacion: number) {
     pasapalabra.jugador.puntuacion = puntuacion;
     pasapalabra.jugador.mostrar_resultados_jugador();
 }
+
+/** El timer ya funciona correctamente, pero el código está hecho a lo guarro, reestructurar y documentar el código */

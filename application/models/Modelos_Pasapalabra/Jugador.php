@@ -6,6 +6,8 @@ class Jugador extends CI_Model implements JsonSerializable {
     private $_rosco;
     private $_num_intentos;
     private $_puntuacion;
+    private $_playing_time;
+    private $_tiempo_partida;
     
     function __construct() {
         parent::__construct();
@@ -43,10 +45,27 @@ class Jugador extends CI_Model implements JsonSerializable {
         $this->_puntuacion = $_puntuacion;
     }
     
+    function get_playing_time() {
+        return $this->_playing_time;
+    }
+
+    function set_playing_time($_playing_time) {
+        $this->_playing_time = $_playing_time;
+    }
+    
+    function get_tiempo_partida() {
+        return $this->_tiempo_partida;
+    }
+
+    function set_tiempo_partida($_tiempo_partida) {
+        $this->_tiempo_partida = $_tiempo_partida;
+    }
+            
     public function jsonSerialize() {
         return [
             '_num_intentos' => $this->_num_intentos,
-            '_puntuacion' => $this->_puntuacion
+            '_puntuacion' => $this->_puntuacion,
+            '_playing_time' => $this->_playing_time
         ];
     }
     

@@ -53,7 +53,9 @@ var RESPONSE = {
     _ROSCO: "_rosco",
     _PREGUNTA: "_pregunta",
     _ACERTAR: "_acertar",
-    _GANAR: "_ganar"
+    _GANAR: "_ganar",
+    _PLAYING_TIME: "_playing_time",
+    _TIEMPO_PARTIDA: "_tiempo_partida"
 };
 //DOM de la ventana de guardar record
 var section_guardar_record = $("section#guardar_record_container");
@@ -72,9 +74,15 @@ var btn_no_guardar_record = document.getElementById("boton_no_guardar_record");
 var VERDE = "verde";
 var ROJO = "rojo";
 //Mensajes que se mostrarán al finalizar el juego
-var DERROTA = "¡No te quedan intentos para seguir jugando!";
-var VICTORIA = "¡Has ganado!";
-//const TIEMPO_INICIAL: number = 300000; 
+var MENSAJE_FIN_JUEGO = {
+    VICTORIA: "¡Has ganado!",
+    DERROTA: "¡No te quedan intentos para seguir jugando!",
+    NO_TIEMPO: "¡Te se ha acabado el tiempo!"
+};
+//TIEMPO INICIAL
+//const TIEMPO_INICIAL: number = 300000;
+var MINUTOS = 1;
+var SEGUNDOS = 0;
 var Dificultad = (function () {
     function Dificultad(dificultad_seleccionada) {
         this._dificultad_seleccionada = dificultad_seleccionada;
@@ -282,23 +290,123 @@ var Resultado_partida = (function () {
             var pregunta = _a[_i];
             if (pregunta.acertada)
                 color_letra = VERDE;
-            else
+            else if (pregunta.acertada == false)
                 color_letra = ROJO;
+            else
+                color_letra = "";
             DOM_tabla += '<tr class="' + color_letra + '" >';
             DOM_tabla += "<td>" + pregunta.letra + "</td>";
             DOM_tabla += "<td>" + pregunta.definicion + "</td>";
             DOM_tabla += "<td>" + pregunta.solucion + "</td>";
-            DOM_tabla += "<td>" + pregunta.respuesta_jugador + "</td>";
+            var respuesta_jugador = pregunta.respuesta_jugador != null ? pregunta.respuesta_jugador : "";
+            DOM_tabla += "<td>" + respuesta_jugador + "</td>";
             DOM_tabla += "</tr>";
         }
         section_resultado_rosco.html(DOM_tabla);
     };
     return Resultado_partida;
 }());
+var Timer = (function () {
+    function Timer() {
+        this._minutos = MINUTOS;
+        this._segundos = SEGUNDOS;
+        this._encendido = false;
+    }
+    Object.defineProperty(Timer.prototype, "minutos", {
+        get: function () {
+            return this._minutos;
+        },
+        set: function (minutos) {
+            this._minutos = minutos;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(Timer.prototype, "segundos", {
+        get: function () {
+            return this._segundos;
+        },
+        set: function (segundos) {
+            this._segundos = segundos;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(Timer.prototype, "encendido", {
+        get: function () {
+            return this._encendido;
+        },
+        set: function (encendido) {
+            this._encendido = encendido;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Timer.prototype.start_timer = function () {
+        this._encendido = true;
+        this.tick();
+    };
+    Timer.prototype.tick = function () {
+        var _this = this;
+        if (this._encendido) {
+            var continuar_juego = true;
+            if (this._segundos - 1 < 0) {
+                if (this._minutos - 1 >= 0) {
+                    this._minutos--;
+                    this._segundos = 59;
+                }
+            }
+            else {
+                this._segundos--;
+            }
+            if (this._minutos == 0 && this._segundos == 0) {
+                continuar_juego = false;
+            }
+            this.actualizar_contador();
+            if (continuar_juego && this._encendido) {
+                setTimeout(function () { _this.tick(); }, 1000);
+            }
+            else {
+                console.log("Other things happen.");
+                this.fin_tiempo();
+            }
+        }
+        else {
+            console.log("Things happen.");
+        }
+    };
+    Timer.prototype.actualizar_contador = function () {
+        var minutos = this._minutos < 10 ? "0" + this._minutos : "" + this._minutos;
+        var segundos = this._segundos < 10 ? "0" + this._segundos : "" + this._segundos;
+        div_tiempo_restante.innerHTML = minutos + ":" + segundos;
+    };
+    Timer.prototype.actualizar_resultados_contador = function (_minutos, _segundos) {
+        this.actualizar_contador();
+        var minutos = _minutos < 10 ? "0" + _minutos : "" + _minutos;
+        var segundos = _segundos < 10 ? "0" + _segundos : "" + _segundos;
+        div_resultados_tiempo.innerHTML = minutos + ":" + segundos;
+    };
+    Timer.prototype.fin_tiempo = function () {
+        sendAjaxRequest("GET", "finish_game", JSON.stringify(""), function (response) {
+            var data = JSON.parse(response);
+            //Si no se ha producido ningún error...
+            if (data[RESPONSE._OK]._ok) {
+                var fondo_titulo = FONDO_ROJO;
+                var mensaje_fin_juego = MENSAJE_FIN_JUEGO.NO_TIEMPO;
+                finalizar_juego(fondo_titulo, mensaje_fin_juego);
+            }
+            else {
+                location.reload();
+            }
+        });
+    };
+    return Timer;
+}());
 var Jugador = (function () {
     function Jugador() {
         this._num_intentos = 10;
         this._puntuacion = 100;
+        this._timer = new Timer();
     }
     Object.defineProperty(Jugador.prototype, "num_intentos", {
         get: function () {
@@ -330,9 +438,20 @@ var Jugador = (function () {
         enumerable: true,
         configurable: true
     });
+    Object.defineProperty(Jugador.prototype, "timer", {
+        get: function () {
+            return this._timer;
+        },
+        set: function (timer) {
+            this._timer = timer;
+        },
+        enumerable: true,
+        configurable: true
+    });
     Jugador.prototype.mostrar_datos_jugador = function () {
         div_num_intentos.innerHTML = this._num_intentos + "";
         div_puntuacion.innerHTML = this._puntuacion + "";
+        this.timer.actualizar_contador();
     };
     Jugador.prototype.mostrar_resultados_jugador = function () {
         div_resultados_intentos.innerHTML = this._num_intentos + "";
@@ -411,6 +530,7 @@ $(document).ready(function () {
                         var obj = data[RESPONSE._JUGADOR];
                         actualizar_marcadores(obj[RESPONSE._NUM_INTENTOS], obj[RESPONSE._PUNTUACION]);
                         obtener_pregunta_rosco();
+                        pasapalabra.jugador.timer.start_timer();
                     }
                     else {
                         location.reload();
@@ -457,10 +577,9 @@ $(document).ready(function () {
                             obtener_pregunta_rosco();
                         }
                         else {
-                            div_resultado.className = FONDO_ROJO;
-                            div_resultado.innerHTML = DERROTA;
-                            pasapalabra.gameState = GameState.GAME_ENDED;
-                            mostrar_resultados();
+                            var fondo_titulo = FONDO_ROJO;
+                            var mensaje_fin_juego = MENSAJE_FIN_JUEGO.DERROTA;
+                            finalizar_juego(fondo_titulo, mensaje_fin_juego);
                         }
                     }
                     else {
@@ -577,8 +696,9 @@ function obtener_pregunta_rosco() {
             var data = JSON.parse(response);
             //Si no se ha producido ningún error...
             if (data[RESPONSE._OK]._ok) {
+                // console.log(response);
                 //Y no se ha acabado el juego
-                if (data[RESPONSE._GANAR]._ganar == null) {
+                if (data[RESPONSE._GANAR]._ganar == null && data[RESPONSE._PLAYING_TIME]._playing_time) {
                     //Creamos un objeto Pregunta a partir de la pregunta recibida por el servidor
                     var pregunta = Pregunta.createFromObject(data[RESPONSE._PREGUNTA]);
                     //Mostramos la pregunta
@@ -591,16 +711,17 @@ function obtener_pregunta_rosco() {
                     pasapalabra.gameState = GameState.ANSWERING;
                 }
                 else {
+                    var fondo_titulo = void 0;
+                    var mensaje_fin_juego = void 0;
                     if (data[RESPONSE._GANAR]._ganar) {
-                        div_resultado.className = FONDO_VERDE;
-                        div_resultado.innerHTML = VICTORIA;
+                        fondo_titulo = FONDO_VERDE;
+                        mensaje_fin_juego = MENSAJE_FIN_JUEGO.VICTORIA;
                     }
                     else {
-                        div_resultado.className = FONDO_ROJO;
-                        div_resultado.innerHTML = DERROTA;
+                        fondo_titulo = FONDO_ROJO;
+                        mensaje_fin_juego = MENSAJE_FIN_JUEGO.DERROTA;
                     }
-                    pasapalabra.gameState = GameState.GAME_ENDED;
-                    mostrar_resultados();
+                    finalizar_juego(fondo_titulo, mensaje_fin_juego);
                 }
             }
             else {
@@ -609,11 +730,21 @@ function obtener_pregunta_rosco() {
         });
     }
 }
+function finalizar_juego(fondo_titulo, mensaje_fin_juego) {
+    div_resultado.className = fondo_titulo;
+    div_resultado.innerHTML = mensaje_fin_juego;
+    pasapalabra.gameState = GameState.GAME_ENDED;
+    pasapalabra.jugador.timer.encendido = false;
+    mostrar_resultados();
+}
 function mostrar_resultados() {
     sendAjaxRequest("GET", "obtener_resultados", JSON.stringify(""), function (response) {
         var data = JSON.parse(response);
-        // console.log(data);
+        console.log(data);
         var _jugador = data[RESPONSE._JUGADOR];
+        var _minutos = data[RESPONSE._TIEMPO_PARTIDA]._minutos;
+        var _segundos = data[RESPONSE._TIEMPO_PARTIDA]._segundos;
+        pasapalabra.jugador.timer.actualizar_resultados_contador(+_minutos, +_segundos);
         actualizar_resultados(_jugador[RESPONSE._NUM_INTENTOS], _jugador[RESPONSE._PUNTUACION]);
         section_guardar_record.show();
         article_formulario_juego.hide();
@@ -630,4 +761,5 @@ function actualizar_resultados(num_intentos, puntuacion) {
     pasapalabra.jugador.puntuacion = puntuacion;
     pasapalabra.jugador.mostrar_resultados_jugador();
 }
+/** El timer ya funciona correctamente, pero el código está hecho a lo guarro, reestructurar y documentar el código */ 
 //# sourceMappingURL=index.js.map

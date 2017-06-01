@@ -3,10 +3,12 @@ class Jugador {
     private _num_intentos: number;
     private _puntuacion: number;
     private _pregunta: Pregunta;
+    private _timer: Timer;
 
     constructor () {
         this._num_intentos = 10;
         this._puntuacion = 100;
+        this._timer = new Timer();
     }
 
     get num_intentos(): number {
@@ -33,9 +35,18 @@ class Jugador {
         this._pregunta = pregunta;
     }
 
+    get timer(): Timer {
+        return this._timer;
+    }
+
+    set timer(timer: Timer) {
+        this._timer = timer;
+    }
+
     public mostrar_datos_jugador(): void {
         div_num_intentos.innerHTML = this._num_intentos + "";
         div_puntuacion.innerHTML = this._puntuacion + "";
+        this.timer.actualizar_contador();
     }
 
     public mostrar_resultados_jugador(): void {
