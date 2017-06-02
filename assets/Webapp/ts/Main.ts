@@ -1,7 +1,9 @@
+//Cargamos toda la información necesaria para empezar el juego
 let pasapalabra = new Pasapalabra();
 
 $(document).ready(function() {
 
+    //Selecciona la dificultad de las preguntas del rosco
     $( "a#boton_seleccion_dificultad" ).click(function(event) {
         event.preventDefault();
 
@@ -40,6 +42,7 @@ $(document).ready(function() {
     });
 
 
+    //Enviará la respuesta del jugador al servidor para comprobar si la pregunta ha sido acertado o no
     $( "a#boton_comprobar" ).click(function(event) {
         event.preventDefault();
 
@@ -59,6 +62,8 @@ $(document).ready(function() {
                 
                 //Enviaremos la respuesta al servidor
                 sendAjaxRequest("POST", "comprobar_pregunta", JSON.stringify(_respuesta), function(response) {
+
+                    //Convertimos el JSON recibido a un vector
                     let data: any = JSON.parse(response);
                     
                     //Si la operación se ha realizado con éxito, continuaremos con el juego
@@ -71,6 +76,7 @@ $(document).ready(function() {
 
                         let clase_div: string;
 
+                        //Dependiendo de si ha acertado o no la pregunta, pintaremos la letra de un color u otro
                         if (solucion.acertar) {
                             clase_div = FONDO_VERDE;
                         }
@@ -91,6 +97,7 @@ $(document).ready(function() {
                         }
                         else {
 
+                            //En el caso de que no le queden intentos, mostraremos el correspondiente mensaje
                             let fondo_titulo: string = FONDO_ROJO;
                             let mensaje_fin_juego: string = MENSAJE_FIN_JUEGO.DERROTA;
                             finalizar_juego(fondo_titulo, mensaje_fin_juego);
@@ -108,6 +115,8 @@ $(document).ready(function() {
             else {
                 div_error_respuesta.style.display = "block";
                 div_error_respuesta.innerHTML = "La respuesta no puede estar vacía";
+                pasapalabra.gameState = GameState.ANSWERING;
+                activar_botones_juego(true);
             }
 
         }
@@ -115,6 +124,7 @@ $(document).ready(function() {
     });
 
 
+    //Pasará a la siguiente pregunta del rosco sin contesar a la actual
     $( "a#boton_saltar" ).click(function(event) { 
         event.preventDefault();
 
@@ -149,6 +159,8 @@ $(document).ready(function() {
         }
     });
 
+
+    //Oculta la ventana que te permite guardar el record
     $( "a#boton_no_guardar_record" ).click(function(event) {
         event.preventDefault();
 
@@ -158,6 +170,8 @@ $(document).ready(function() {
         
     });
 
+
+    //Empieza una nueva partida
     $( "a#boton_nueva_partida" ).click(function(event) {
         event.preventDefault();
 
@@ -181,12 +195,14 @@ $(document).ready(function() {
 
 }); // END $(document).ready();
 
-//Actualiza los marcadores de puntuación y número de intentos
+
+//Actualiza los marcadores de puntuación y número de intentos de la parte superior de la pantalla
 function actualizar_marcadores(num_intentos: number, puntuacion: number) {
     pasapalabra.jugador.num_intentos = num_intentos;
     pasapalabra.jugador.puntuacion = puntuacion;
     pasapalabra.jugador.mostrar_datos_jugador();
 }
+
 
 //Dado un código, obtiene su dificultad
 function get_nombre_dificultad(dificultad_seleccionada: number): string {
@@ -202,6 +218,7 @@ function get_nombre_dificultad(dificultad_seleccionada: number): string {
     return nombre_dificultad;
 
 }
+
 
 //Método genérico que se utilizará para enviar todas las peticiones AJAX que se enviarán en el juego
 function sendAjaxRequest(_type: string, _url: string, _params: string, _callback: CallbackFunction) {
@@ -222,6 +239,7 @@ function sendAjaxRequest(_type: string, _url: string, _params: string, _callback
 
 }
 
+
 //Activa o desactiva la parte interactuable con el jugador del formulario de preguntas
 function activar_botones_juego(activar: boolean): void {
 
@@ -237,6 +255,7 @@ function activar_botones_juego(activar: boolean): void {
     }
 }
 
+
 //Obtiene una pregunta del servidor, la guarda en la instancia del jugador y la muestra por pantalla
 function obtener_pregunta_rosco(): void {
     
@@ -247,8 +266,8 @@ function obtener_pregunta_rosco(): void {
 
             //Si no se ha producido ningún error...
             if (data[RESPONSE._OK]._ok) {
-                // console.log(response);
-                //Y no se ha acabado el juego
+
+                //Y no se ha acabado el juego ni se ha acabado el tiempo
                 if (data[RESPONSE._GANAR]._ganar == null && data[RESPONSE._PLAYING_TIME]._playing_time) {
                     
                     //Creamos un objeto Pregunta a partir de la pregunta recibida por el servidor
@@ -266,6 +285,7 @@ function obtener_pregunta_rosco(): void {
                     pasapalabra.gameState = GameState.ANSWERING;
 
                 }
+                //Si el juego se ha acabado, mostraremos el correspondiente mensaje
                 else {
 
                     let fondo_titulo: string;
@@ -280,6 +300,7 @@ function obtener_pregunta_rosco(): void {
                         mensaje_fin_juego = MENSAJE_FIN_JUEGO.DERROTA;
                     }
                     
+                    //Y finalizaremos el juego mostrando la solucion del rosco
                     finalizar_juego(fondo_titulo, mensaje_fin_juego);
                     
                 }
@@ -295,6 +316,8 @@ function obtener_pregunta_rosco(): void {
 
 }
 
+
+//Dado un mensaje y una clase, muestra su correspondiente mensaje en la ventana de los resultados finales
 function finalizar_juego(fondo_titulo: string, mensaje_fin_juego: string) {
 
     div_resultado.className = fondo_titulo;
@@ -305,26 +328,35 @@ function finalizar_juego(fondo_titulo: string, mensaje_fin_juego: string) {
 
 }
 
+
+//Envía al servidor una petición para obtener los resultados finales y los muestra en la sección de resultados
 function mostrar_resultados(): void {
 
     sendAjaxRequest("GET", "obtener_resultados", JSON.stringify(""), function(response) {
 
+        //Convertimos el JSON recibido en un vector
         let data: any = JSON.parse(response);
-        console.log(data);
 
+        //Extraemos el jugador (puntuacion y numero de intentos), los minutos y segundos
         let _jugador: Object = data[RESPONSE._JUGADOR];
         let _minutos: string = data[RESPONSE._TIEMPO_PARTIDA]._minutos;
         let _segundos: string = data[RESPONSE._TIEMPO_PARTIDA]._segundos;
+
+        //Actualizamos el timer de la ventana de guardar record con el tiempo recibido
         pasapalabra.jugador.timer.actualizar_resultados_contador( +_minutos, +_segundos );
 
+        //Actualizamos la puntuación y número de intentos en la parte superior de la pantalla
         actualizar_resultados(_jugador[RESPONSE._NUM_INTENTOS], _jugador[RESPONSE._PUNTUACION]);
 
+        //Mostramos y ocultamos las interfaces correspondientes
         section_guardar_record.show();
         article_formulario_juego.hide();
         article_resultados.show();
 
+        //Obtenemos el rosco
         let rosco: any = data[RESPONSE._ROSCO];
-        let resultado: Resultado_partida = new Resultado_partida();
+
+        //Guardamos el rosco en memoria y lo mostramos
         pasapalabra.resultado_partida.object_to_pregunta_completa(rosco);
         pasapalabra.resultado_partida.mostrar_tabla_resultados();
 
@@ -338,5 +370,3 @@ function actualizar_resultados(num_intentos: number, puntuacion: number) {
     pasapalabra.jugador.puntuacion = puntuacion;
     pasapalabra.jugador.mostrar_resultados_jugador();
 }
-
-/** El timer ya funciona correctamente, pero el código está hecho a lo guarro, reestructurar y documentar el código */

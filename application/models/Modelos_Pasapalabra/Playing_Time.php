@@ -3,8 +3,9 @@
 class Playing_Time extends CI_Model implements JsonSerializable {
     
     private $_tiempo_inicio;
+    private $_tiempo_maximo;
     private $_playing_time;
-    private $_tiempo_fin;
+    private $_duracion_juego;
  
     function __construct() {
         parent::__construct();
@@ -26,14 +27,22 @@ class Playing_Time extends CI_Model implements JsonSerializable {
         $this->_playing_time = $_playing_time;
     }
     
-    function get_tiempo_fin() {
-        return $this->_tiempo_fin;
+    function get_duracion_juego() {
+        return $this->_duracion_juego;
     }
 
-    function set_tiempo_fin($_tiempo_fin) {
-        $this->_tiempo_fin = $_tiempo_fin;
+    function set_duracion_juego($_duracion_juego) {
+        $this->_duracion_juego = $_duracion_juego;
     }
-           
+    
+    function get_tiempo_maximo() {
+        return $this->_tiempo_maximo;
+    }
+
+    function set_tiempo_maximo($_tiempo_maximo) {
+        $this->_tiempo_maximo = $_tiempo_maximo;
+    }
+               
     public function jsonSerialize() {
         return [
             '_playing_time' => $this->_playing_time

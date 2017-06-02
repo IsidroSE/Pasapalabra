@@ -95,5 +95,5 @@ const MENSAJE_FIN_JUEGO: any = {
 
 //TIEMPO INICIAL
 //const TIEMPO_INICIAL: number = 300000;
-const MINUTOS: number = 1;
+const MINUTOS: number = 5;
 const SEGUNDOS: number = 0;

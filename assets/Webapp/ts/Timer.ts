@@ -68,13 +68,8 @@ class Timer {
                 setTimeout(() => {this.tick()}, 1000);
             }
             else {
-                console.log("Other things happen.");
                 this.fin_tiempo();
             }
-
-        }
-        else {
-            console.log("Things happen.");
         }
 
     }

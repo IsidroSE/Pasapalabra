@@ -81,7 +81,7 @@ var MENSAJE_FIN_JUEGO = {
 };
 //TIEMPO INICIAL
 //const TIEMPO_INICIAL: number = 300000;
-var MINUTOS = 1;
+var MINUTOS = 5;
 var SEGUNDOS = 0;
 var Dificultad = (function () {
     function Dificultad(dificultad_seleccionada) {
@@ -367,12 +367,8 @@ var Timer = (function () {
                 setTimeout(function () { _this.tick(); }, 1000);
             }
             else {
-                console.log("Other things happen.");
                 this.fin_tiempo();
             }
-        }
-        else {
-            console.log("Things happen.");
         }
     };
     Timer.prototype.actualizar_contador = function () {
@@ -509,8 +505,10 @@ var Pasapalabra = (function () {
     });
     return Pasapalabra;
 }());
+//Cargamos toda la información necesaria para empezar el juego
 var pasapalabra = new Pasapalabra();
 $(document).ready(function () {
+    //Selecciona la dificultad de las preguntas del rosco
     $("a#boton_seleccion_dificultad").click(function (event) {
         event.preventDefault();
         if (pasapalabra.gameState == GameState.GAME_STARTING) {
@@ -539,6 +537,7 @@ $(document).ready(function () {
             }
         }
     });
+    //Enviará la respuesta del jugador al servidor para comprobar si la pregunta ha sido acertado o no
     $("a#boton_comprobar").click(function (event) {
         event.preventDefault();
         if (pasapalabra.gameState == GameState.ANSWERING) {
@@ -553,6 +552,7 @@ $(document).ready(function () {
                 var _respuesta = new Respuesta(pasapalabra.jugador.pregunta.letra, input_respuesta_pregunta.value);
                 //Enviaremos la respuesta al servidor
                 sendAjaxRequest("POST", "comprobar_pregunta", JSON.stringify(_respuesta), function (response) {
+                    //Convertimos el JSON recibido a un vector
                     var data = JSON.parse(response);
                     //Si la operación se ha realizado con éxito, continuaremos con el juego
                     if (data[RESPONSE._OK]._ok) {
@@ -561,6 +561,7 @@ $(document).ready(function () {
                         //Convertimos el objeto recibido en un objeto Acertar
                         var solucion = Acertar.createFromObject(data[RESPONSE._ACERTAR]);
                         var clase_div = void 0;
+                        //Dependiendo de si ha acertado o no la pregunta, pintaremos la letra de un color u otro
                         if (solucion.acertar) {
                             clase_div = FONDO_VERDE;
                         }
@@ -577,6 +578,7 @@ $(document).ready(function () {
                             obtener_pregunta_rosco();
                         }
                         else {
+                            //En el caso de que no le queden intentos, mostraremos el correspondiente mensaje
                             var fondo_titulo = FONDO_ROJO;
                             var mensaje_fin_juego = MENSAJE_FIN_JUEGO.DERROTA;
                             finalizar_juego(fondo_titulo, mensaje_fin_juego);
@@ -590,9 +592,12 @@ $(document).ready(function () {
             else {
                 div_error_respuesta.style.display = "block";
                 div_error_respuesta.innerHTML = "La respuesta no puede estar vacía";
+                pasapalabra.gameState = GameState.ANSWERING;
+                activar_botones_juego(true);
             }
         }
     });
+    //Pasará a la siguiente pregunta del rosco sin contesar a la actual
     $("a#boton_saltar").click(function (event) {
         event.preventDefault();
         if (pasapalabra.gameState == GameState.ANSWERING) {
@@ -618,12 +623,14 @@ $(document).ready(function () {
             });
         }
     });
+    //Oculta la ventana que te permite guardar el record
     $("a#boton_no_guardar_record").click(function (event) {
         event.preventDefault();
         if (pasapalabra.gameState == GameState.GAME_ENDED) {
             section_guardar_record.hide();
         }
     });
+    //Empieza una nueva partida
     $("a#boton_nueva_partida").click(function (event) {
         event.preventDefault();
         if (pasapalabra.gameState == GameState.GAME_ENDED) {
@@ -639,7 +646,7 @@ $(document).ready(function () {
         }
     });
 }); // END $(document).ready();
-//Actualiza los marcadores de puntuación y número de intentos
+//Actualiza los marcadores de puntuación y número de intentos de la parte superior de la pantalla
 function actualizar_marcadores(num_intentos, puntuacion) {
     pasapalabra.jugador.num_intentos = num_intentos;
     pasapalabra.jugador.puntuacion = puntuacion;
@@ -696,8 +703,7 @@ function obtener_pregunta_rosco() {
             var data = JSON.parse(response);
             //Si no se ha producido ningún error...
             if (data[RESPONSE._OK]._ok) {
-                // console.log(response);
-                //Y no se ha acabado el juego
+                //Y no se ha acabado el juego ni se ha acabado el tiempo
                 if (data[RESPONSE._GANAR]._ganar == null && data[RESPONSE._PLAYING_TIME]._playing_time) {
                     //Creamos un objeto Pregunta a partir de la pregunta recibida por el servidor
                     var pregunta = Pregunta.createFromObject(data[RESPONSE._PREGUNTA]);
@@ -721,6 +727,7 @@ function obtener_pregunta_rosco() {
                         fondo_titulo = FONDO_ROJO;
                         mensaje_fin_juego = MENSAJE_FIN_JUEGO.DERROTA;
                     }
+                    //Y finalizaremos el juego mostrando la solucion del rosco
                     finalizar_juego(fondo_titulo, mensaje_fin_juego);
                 }
             }
@@ -730,6 +737,7 @@ function obtener_pregunta_rosco() {
         });
     }
 }
+//Dado un mensaje y una clase, muestra su correspondiente mensaje en la ventana de los resultados finales
 function finalizar_juego(fondo_titulo, mensaje_fin_juego) {
     div_resultado.className = fondo_titulo;
     div_resultado.innerHTML = mensaje_fin_juego;
@@ -737,20 +745,26 @@ function finalizar_juego(fondo_titulo, mensaje_fin_juego) {
     pasapalabra.jugador.timer.encendido = false;
     mostrar_resultados();
 }
+//Envía al servidor una petición para obtener los resultados finales y los muestra en la sección de resultados
 function mostrar_resultados() {
     sendAjaxRequest("GET", "obtener_resultados", JSON.stringify(""), function (response) {
+        //Convertimos el JSON recibido en un vector
         var data = JSON.parse(response);
-        console.log(data);
+        //Extraemos el jugador (puntuacion y numero de intentos), los minutos y segundos
         var _jugador = data[RESPONSE._JUGADOR];
         var _minutos = data[RESPONSE._TIEMPO_PARTIDA]._minutos;
         var _segundos = data[RESPONSE._TIEMPO_PARTIDA]._segundos;
+        //Actualizamos el timer de la ventana de guardar record con el tiempo recibido
         pasapalabra.jugador.timer.actualizar_resultados_contador(+_minutos, +_segundos);
+        //Actualizamos la puntuación y número de intentos en la parte superior de la pantalla
         actualizar_resultados(_jugador[RESPONSE._NUM_INTENTOS], _jugador[RESPONSE._PUNTUACION]);
+        //Mostramos y ocultamos las interfaces correspondientes
         section_guardar_record.show();
         article_formulario_juego.hide();
         article_resultados.show();
+        //Obtenemos el rosco
         var rosco = data[RESPONSE._ROSCO];
-        var resultado = new Resultado_partida();
+        //Guardamos el rosco en memoria y lo mostramos
         pasapalabra.resultado_partida.object_to_pregunta_completa(rosco);
         pasapalabra.resultado_partida.mostrar_tabla_resultados();
     });
@@ -761,5 +775,4 @@ function actualizar_resultados(num_intentos, puntuacion) {
     pasapalabra.jugador.puntuacion = puntuacion;
     pasapalabra.jugador.mostrar_resultados_jugador();
 }
-/** El timer ya funciona correctamente, pero el código está hecho a lo guarro, reestructurar y documentar el código */ 
 //# sourceMappingURL=index.js.map
