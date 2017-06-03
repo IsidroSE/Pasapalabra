@@ -15,6 +15,7 @@
         "ts/Acertar.ts",
         "ts/Pregunta_completa.ts",
         "ts/Resultado_partida.ts",
+        "ts/Record.ts",
         "ts/Timer.ts",
         "ts/Jugador.ts",
         "ts/Pasapalabra.ts",

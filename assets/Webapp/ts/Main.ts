@@ -160,17 +160,6 @@ $(document).ready(function() {
     });
 
 
-    //Oculta la ventana que te permite guardar el record
-    $( "a#boton_no_guardar_record" ).click(function(event) {
-        event.preventDefault();
-
-        if (pasapalabra.gameState == GameState.GAME_ENDED) {
-            section_guardar_record.hide();
-        }
-        
-    });
-
-
     //Empieza una nueva partida
     $( "a#boton_nueva_partida" ).click(function(event) {
         event.preventDefault();
@@ -192,6 +181,49 @@ $(document).ready(function() {
         }
 
     });
+
+
+    //Oculta la ventana que te permite guardar el record
+    $( "a#boton_no_guardar_record" ).click(function(event) {
+        event.preventDefault();
+
+        if (pasapalabra.gameState == GameState.GAME_ENDED) {
+            section_guardar_record.hide();
+        }
+        
+    });
+
+
+    //Obtiene el nick escrito y guarda el record en la base de datos
+    $( "a#boton_guardar_record" ).click(function(event) {
+        event.preventDefault();
+
+        if (pasapalabra.gameState == GameState.GAME_ENDED) {
+
+            let nick: string = input_nick_introducido.value;
+
+            if (nick != "") {
+
+                let record: Record_jugador = new Record_jugador(nick);
+            
+                sendAjaxRequest("POST", "guardar_record", JSON.stringify(record), function(response) {
+                    let data: any = JSON.parse(response);
+                    
+                    if (data[RESPONSE._OK]._ok) {
+                        section_guardar_record.hide();
+                    }
+                    else {
+                        location.reload();
+                    }
+
+                });
+
+            }
+
+        }
+
+    });
+
 
 }); // END $(document).ready();
 

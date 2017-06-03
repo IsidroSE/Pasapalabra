@@ -80,7 +80,6 @@ var MENSAJE_FIN_JUEGO = {
     NO_TIEMPO: "¡Te se ha acabado el tiempo!"
 };
 //TIEMPO INICIAL
-//const TIEMPO_INICIAL: number = 300000;
 var MINUTOS = 5;
 var SEGUNDOS = 0;
 var Dificultad = (function () {
@@ -305,6 +304,22 @@ var Resultado_partida = (function () {
         section_resultado_rosco.html(DOM_tabla);
     };
     return Resultado_partida;
+}());
+var Record_jugador = (function () {
+    function Record_jugador(player_name) {
+        this._player_name = player_name;
+    }
+    Object.defineProperty(Record_jugador.prototype, "dificultad_seleccionada", {
+        get: function () {
+            return this._player_name;
+        },
+        set: function (player_name) {
+            this._player_name = player_name;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    return Record_jugador;
 }());
 var Timer = (function () {
     function Timer() {
@@ -623,13 +638,6 @@ $(document).ready(function () {
             });
         }
     });
-    //Oculta la ventana que te permite guardar el record
-    $("a#boton_no_guardar_record").click(function (event) {
-        event.preventDefault();
-        if (pasapalabra.gameState == GameState.GAME_ENDED) {
-            section_guardar_record.hide();
-        }
-    });
     //Empieza una nueva partida
     $("a#boton_nueva_partida").click(function (event) {
         event.preventDefault();
@@ -643,6 +651,32 @@ $(document).ready(function () {
                     location.reload();
                 }
             });
+        }
+    });
+    //Oculta la ventana que te permite guardar el record
+    $("a#boton_no_guardar_record").click(function (event) {
+        event.preventDefault();
+        if (pasapalabra.gameState == GameState.GAME_ENDED) {
+            section_guardar_record.hide();
+        }
+    });
+    //Obtiene el nick escrito y guarda el record en la base de datos
+    $("a#boton_guardar_record").click(function (event) {
+        event.preventDefault();
+        if (pasapalabra.gameState == GameState.GAME_ENDED) {
+            var nick = input_nick_introducido.value;
+            if (nick != "") {
+                var record = new Record_jugador(nick);
+                sendAjaxRequest("POST", "guardar_record", JSON.stringify(record), function (response) {
+                    var data = JSON.parse(response);
+                    if (data[RESPONSE._OK]._ok) {
+                        section_guardar_record.hide();
+                    }
+                    else {
+                        location.reload();
+                    }
+                });
+            }
         }
     });
 }); // END $(document).ready();

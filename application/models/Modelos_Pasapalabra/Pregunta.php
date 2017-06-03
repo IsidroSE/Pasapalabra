@@ -2,8 +2,6 @@
 
 class Pregunta extends CI_Model implements JsonSerializable {
     
-    //const $LETRAS_ROSCO = range('A', 'Z');
-    
     private $_letra;
     private $_dificultad;
     private $_definicion;

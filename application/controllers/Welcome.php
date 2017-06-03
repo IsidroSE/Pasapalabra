@@ -31,6 +31,7 @@ class Welcome extends CI_Controller {
         $this->load->helper('url');
         $this->load->model("Rol_model");
         $this->load->model("Questions_model");
+        $this->load->model("Records_model");
 
         //Clases de Pasapalabra
         $this->load->model("Modelos_Pasapalabra/Dificultad");
@@ -43,6 +44,7 @@ class Welcome extends CI_Controller {
         $this->load->model("Modelos_Pasapalabra/Rosco");
         $this->load->model("Modelos_Pasapalabra/Jugador");
         $this->load->model("Modelos_Pasapalabra/Ganar");
+        $this->load->model("Modelos_Pasapalabra/Record");
 
         //Librerías del juego
         $this->load->library('Librerias_Pasapalabra/Config_Pasapalabra');
@@ -242,10 +244,15 @@ class Welcome extends CI_Controller {
 //        echo Config_Pasapalabra::GAMESTATE["GAME_STARTING"];
 //        echo Config_Pasapalabra::NUM_INTENTOS_INICIAL;
 //        echo Config_Pasapalabra::PUNTUACION_INCIAL;
-
-        $tiempo_juego = $this->obtener_tiempo_juego(time(), (time() + (5 * 60)));
-        echo $tiempo_juego->get_minutos() . "<br>";
-        echo $tiempo_juego->get_segundos() . "<br>";
+        
+//        $record = new $this->Record();
+//        $record->set_player_name("Pepino");
+//        $record->set_points(30);
+//        $record->set_dificultad("Normal");
+//        $record->set_time(date("H:i:s", strtotime("0:3:40")));
+//        
+//        $post = $this->Records_model->insert_record($record);
+//        echo "sdfsef: " . $post;
     }
 
     
@@ -860,6 +867,64 @@ class Welcome extends CI_Controller {
         }
 
         //Crearemos un objeto de la clase OK con el resultado de la validación
+        $ok = new $this->OK();
+        $ok->set_ok(!$error);
+
+        //Preparemos la información que le enviaremos al cliente
+        $response = array(
+            Config_Pasapalabra::RESPONSE["OK"] => $ok
+        );
+
+        //Enviamos la respuesta al cliente
+        echo json_encode($response);
+        
+    }
+    
+    public function guardar_record() {
+        
+        //Comprobamos si el jugador existe
+        if (isset($this->session->JUGADOR)) {
+
+            $jugador = $this->session->JUGADOR;
+
+            if ($jugador->get_gameState() == Config_Pasapalabra::GAMESTATE["GAME_ENDED"]) {
+                
+                //Obtenemos el nick del jugador
+                $json = file_get_contents('php://input');
+                
+                //Creamos el objeto record que insertaremos en la BD
+                $record = Record::createFromJson($json);
+                
+                //Obtenemos el resto de datos de la sesión
+                $puntuacion = $jugador->get_puntuacion();
+                $dificultad = $jugador->get_rosco()->getDificultad_rosco()->get_dificultad_seleccionada();
+                $duracion_juego = $jugador->get_tiempo_partida();
+                $tiempo = "0:" . $duracion_juego->get_minutos() . ":" . $duracion_juego->get_segundos();
+                
+                //Los introducimos en el objeto record
+                $record->set_points($puntuacion);
+                $record->set_dificultad($dificultad);
+                $record->set_time(date("H:i:s", strtotime($tiempo)));
+                
+                $result = $this->Records_model->insert_record($record);
+                
+                if ($result == 1) {
+                    $error = false;
+                }
+                else {
+                    $error = true;
+                }
+                
+            }
+            else {
+                $error = true;
+            }
+        }
+        else {
+            $error = true;
+        }
+
+        //Crearemos un objeto de la clase OK con el resultado de la operación
         $ok = new $this->OK();
         $ok->set_ok(!$error);
 
