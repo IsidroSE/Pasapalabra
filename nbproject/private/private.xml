@@ -5,6 +5,7 @@
         <group>
             <file>file:/C:/xampp/htdocs/Pasapalabra/application/models/Records_model.php</file>
             <file>file:/C:/xampp/htdocs/Pasapalabra/assets/Webapp/css/index_style.css</file>
+            <file>file:/C:/xampp/htdocs/Pasapalabra/application/views/frontoffice/vm_grocery_crud.php</file>
             <file>file:/C:/xampp/htdocs/Pasapalabra/application/models/Modelos_Pasapalabra/Tiempo_Partida.php</file>
             <file>file:/C:/xampp/htdocs/Pasapalabra/application/libraries/Librerias_Pasapalabra/Config_Pasapalabra.php</file>
             <file>file:/C:/xampp/htdocs/Pasapalabra/application/models/Modelos_Pasapalabra/Record.php</file>

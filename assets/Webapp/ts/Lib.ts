@@ -96,3 +96,8 @@ const MENSAJE_FIN_JUEGO: any = {
 //TIEMPO INICIAL
 const MINUTOS: number = 5;
 const SEGUNDOS: number = 0;
+
+//Records
+let records_facil: JQuery = <JQuery>$("table#records_facil");
+let records_normal: JQuery = <JQuery>$("table#records_normal");
+let records_dificil: JQuery = <JQuery>$("table#records_dificil");

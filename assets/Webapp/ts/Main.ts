@@ -1,4 +1,5 @@
 //Cargamos toda la información necesaria para empezar el juego
+records_normal.show();
 let pasapalabra = new Pasapalabra();
 
 $(document).ready(function() {
@@ -220,6 +221,20 @@ $(document).ready(function() {
 
             }
 
+        }
+
+    });
+
+    // select_dificultad.value
+
+    $('#select_dificultad_record').change(function() {
+        
+        $("section#records table").hide();
+
+        switch($(this).val()) {
+            case "201": records_facil.show(); break;
+            case "202": records_normal.show(); break;
+            case "203": records_dificil.show(); break;
         }
 
     });

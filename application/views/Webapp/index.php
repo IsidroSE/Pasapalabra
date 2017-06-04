@@ -161,52 +161,87 @@
             
             <h4>10 mejores resultados</h4>
             
-            <table>
+            <select id="select_dificultad_record">
+                <option value="201">Fácil</option>
+                <option value="202" selected="selected">Normal</option>
+                <option value="203">Difícil</option>
+            </select>
+            
+            <table id="records_facil">
                 <thead>
                     <tr>
                         <th></th>
-                        <th>10 mejores resultados</th>
+                        <th>Nombre</th>
                         <th>Puntos</th>
                         <th>Tiempo</th>
                         <th>Fecha</th>
                     </tr>
                 </thead>
                 <tbody>
+                    <?php
+                        for ($x = 0; $x <= count($facil) - 1; $x++) {
+                            echo "<tr>";
+                            echo "<td>" . ($x+1) . "</td>";
+                            echo "<td>" . $facil[$x]->record_player . "</td>";
+                            echo "<td>" . $facil[$x]->record_points . "</td>";
+                            $duracion = $facil[$x]->record_time . "";
+                            echo "<td>" . substr($duracion, 3) . "</td>";
+                            echo "<td>" . $facil[$x]->record_date . "</td>";
+                            echo "</tr>";
+                        }
+                    ?>
+                </tbody>
+            </table>
+            
+            <table id="records_normal">
+                <thead>
                     <tr>
-                        <td>1</td>
-                        <td>Pepe</td>
-                        <td>100</td>
-                        <td>02:22 min.</td>
-                        <td>05/03/2017</td>
+                        <th></th>
+                        <th>Nombre</th>
+                        <th>Puntos</th>
+                        <th>Tiempo</th>
+                        <th>Fecha</th>
                     </tr>
+                </thead>
+                <tbody>
+                    <?php
+                        for ($x = 0; $x <= count($normal) - 1; $x++) {
+                            echo "<tr>";
+                            echo "<td>" . ($x+1) . "</td>";
+                            echo "<td>" . $normal[$x]->record_player . "</td>";
+                            echo "<td>" . $normal[$x]->record_points . "</td>";
+                            $duracion = $normal[$x]->record_time . "";
+                            echo "<td>" . substr($duracion, 3) . "</td>";
+                            echo "<td>" . $normal[$x]->record_date . "</td>";
+                            echo "</tr>";
+                        }
+                    ?>
+                </tbody>
+            </table>
+            
+            <table id="records_dificil">
+                <thead>
                     <tr>
-                        <td>2</td>
-                        <td>Paco</td>
-                        <td>100</td>
-                        <td>02:36 min.</td>
-                        <td>13/03/2017</td>
+                        <th></th>
+                        <th>Nombre</th>
+                        <th>Puntos</th>
+                        <th>Tiempo</th>
+                        <th>Fecha</th>
                     </tr>
-                    <tr>
-                        <td>3</td>
-                        <td>Palomo</td>
-                        <td>100</td>
-                        <td>03:59 min.</td>
-                        <td>14/03/2017</td>
-                    </tr>
-                    <tr>
-                        <td>4</td>
-                        <td>Tobías</td>
-                        <td>90</td>
-                        <td>02:49 min.</td>
-                        <td>07/03/2017</td>
-                    </tr>
-                    <tr>
-                        <td>5</td>
-                        <td>Alfonso</td>
-                        <td>80</td>
-                        <td>03:55 min.</td>
-                        <td>01/03/2017</td>
-                    </tr>
+                </thead>
+                <tbody>
+                    <?php
+                        for ($x = 0; $x <= count($dificil) - 1; $x++) {
+                            echo "<tr>";
+                            echo "<td>" . ($x+1) . "</td>";
+                            echo "<td>" . $dificil[$x]->record_player . "</td>";
+                            echo "<td>" . $dificil[$x]->record_points . "</td>";
+                            $duracion = $dificil[$x]->record_time . "";
+                            echo "<td>" . substr($duracion, 3) . "</td>";
+                            echo "<td>" . $dificil[$x]->record_date . "</td>";
+                            echo "</tr>";
+                        }
+                    ?>
                 </tbody>
             </table>
             

@@ -82,6 +82,10 @@ var MENSAJE_FIN_JUEGO = {
 //TIEMPO INICIAL
 var MINUTOS = 5;
 var SEGUNDOS = 0;
+//Records
+var records_facil = $("table#records_facil");
+var records_normal = $("table#records_normal");
+var records_dificil = $("table#records_dificil");
 var Dificultad = (function () {
     function Dificultad(dificultad_seleccionada) {
         this._dificultad_seleccionada = dificultad_seleccionada;
@@ -521,6 +525,7 @@ var Pasapalabra = (function () {
     return Pasapalabra;
 }());
 //Cargamos toda la información necesaria para empezar el juego
+records_normal.show();
 var pasapalabra = new Pasapalabra();
 $(document).ready(function () {
     //Selecciona la dificultad de las preguntas del rosco
@@ -677,6 +682,21 @@ $(document).ready(function () {
                     }
                 });
             }
+        }
+    });
+    // select_dificultad.value
+    $('#select_dificultad_record').change(function () {
+        $("section#records table").hide();
+        switch ($(this).val()) {
+            case "201":
+                records_facil.show();
+                break;
+            case "202":
+                records_normal.show();
+                break;
+            case "203":
+                records_dificil.show();
+                break;
         }
     });
 }); // END $(document).ready();

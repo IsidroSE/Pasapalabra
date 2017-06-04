@@ -54,7 +54,14 @@ class Welcome extends CI_Controller {
     }
 
     public function index() {
-        $this->load->view('Webapp/index');
+        
+        $records = array(
+            "facil" => $this->Records_model->get_top10(Config_Pasapalabra::DIFICULTAD["FACIL"]),
+            "normal" => $this->Records_model->get_top10(Config_Pasapalabra::DIFICULTAD["NORMAL"]),
+            "dificil" => $this->Records_model->get_top10(Config_Pasapalabra::DIFICULTAD["DIFICIL"])
+        );
+        
+        $this->load->view('Webapp/index', $records);
     }
 
     public function login() {
@@ -253,6 +260,15 @@ class Welcome extends CI_Controller {
 //        
 //        $post = $this->Records_model->insert_record($record);
 //        echo "sdfsef: " . $post;
+        
+        $records = array(
+            "facil" => $this->Records_model->get_top10(Config_Pasapalabra::DIFICULTAD["FACIL"]),
+            "normal" => $this->Records_model->get_top10(Config_Pasapalabra::DIFICULTAD["NORMAL"]),
+            "dificil" => $this->Records_model->get_top10(Config_Pasapalabra::DIFICULTAD["DIFICIL"])
+        );
+        
+        print_r($records);
+        
     }
 
     
